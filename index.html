@@ -146,7 +146,7 @@ body.results-mode .logo-dot { background: var(--accent); box-shadow: 0 0 10px rg
 body.results-mode .results-h1 { color: #0f172a; }
 body.results-mode .results-sub { color: #64748b; }
 body.results-mode .rank-panel { background: #1e293b; border-top: 1px solid rgba(255,255,255,0.06); }
-body.results-mode .panel-title { color: #0f172a; }
+body.results-mode .panel-title { color: #ffffff; }
 body.results-mode .panel-name { color: #0f172a; }
 body.results-mode .panel-row { border-bottom-color: rgba(0,0,0,0.06); }
 body.results-mode .panel-row:hover { background: #f8fafc; }
@@ -421,11 +421,67 @@ body.results-mode .sync-status.status-off {
 .qr-error { font-size: 0.8rem; color: var(--muted); text-align: center; padding: 20px; }
 
 @media (max-width: 640px) {
+  /* Admin */
   .team-row { grid-template-columns: 50px 1fr; }
   .time-block, .avg-cell { grid-column: 1/-1; }
-  /* rank panel always visible */
-  .results-h1 { font-size: 1.4rem; }
-  .track-lanes-wrap { padding-right: 50px; }
+
+  /* Results banner */
+  .results-banner {
+    padding: 14px 14px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .results-banner > div { width: 100%; }
+  .results-h1 { font-size: 1.3rem; }
+  .results-sub { font-size: 0.75rem; }
+
+  /* Banner buttons row */
+  .results-banner > div:last-child {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  }
+  .pdf-btn { font-size: 0.72rem; padding: 5px 9px; }
+
+  /* Logo smaller on mobile */
+  .results-banner img { height: 36px !important; }
+
+  /* Track: smaller lanes, less padding */
+  .track-lanes-wrap { padding: 8px 58px 8px 10px; }
+  .lane { height: 46px; }
+  .lane.lane-first { height: 60px; }
+  .bob-svg-outer { width: 70px !important; height: 32px !important; }
+  .bob-below { max-width: 120px; }
+  .bob-name { font-size: 0.52rem; max-width: 72px; }
+  .bob-time { font-size: 0.5rem; }
+  .rank-left { width: 24px; }
+  .rank-pill { font-size: 0.55rem; padding: 2px 4px; min-width: 20px; }
+
+  /* Finish gate smaller */
+  .finish-gate { right: 20px; width: 36px; }
+  .finish-gate-checks { width: 14px; }
+  .finish-gate-bar { width: 14px; }
+  .finish-flag-top { font-size: 1.3rem; }
+  .finish-label { font-size: 0.45rem; top: 28px; }
+
+  /* Rank panel: 2-column wrap on mobile */
+  #rankList { 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    min-width: unset;
+    width: 100%;
+  }
+  .panel-row { padding: 5px 7px; }
+  .panel-name { font-size: 0.68rem; }
+  .panel-t { font-size: 0.58rem; }
+  .rank-panel { padding: 8px 10px 10px; }
+  .panel-title { font-size: 0.7rem; margin-bottom: 5px; }
+}
+
+@media (max-width: 380px) {
+  .results-h1 { font-size: 1.1rem; }
+  #rankList { grid-template-columns: 1fr; }
+  .lane { height: 40px; }
 }
 </style>
 </head>
