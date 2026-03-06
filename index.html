@@ -231,7 +231,9 @@ body.results-mode .sync-status.status-off {
 
 /* Track */
 .track-outer {
-  position: relative; overflow: hidden; min-height: 380px;
+  position: relative; overflow-y: auto; overflow-x: hidden;
+  max-height: calc(100vh - 220px);
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;
   background: linear-gradient(180deg,
     #060d18 0%, #0b1e36 8%, #0f2e58 18%,
     #1254a0 30%, #2e82c8 44%,
@@ -476,9 +478,9 @@ body.results-mode .sync-status.status-off {
 
   /* Track: smaller lanes, less padding */
   .track-lanes-wrap { padding: 8px 58px 8px 10px; }
-  .lane { height: 46px; }
-  .lane.lane-first { height: 60px; }
-  .bob-svg-outer { width: 70px !important; height: 32px !important; }
+  .lane { height: 56px; }
+  .lane.lane-first { height: 72px; }
+
   .bob-name { font-size: 0.52rem; }
   .bob-time { font-size: 0.5rem; }
   .rank-left { width: 24px; }
@@ -1134,10 +1136,18 @@ function renameTeam(id,val){
   const t=teams.find(x=>x.id===id);if(!t||!val.trim())return;
   t.name=val.trim();save();
 }
+// Debounce timer for save — only writes localStorage + syncs after 600ms of no typing
+let _saveDebounce = null;
+
 function upd(id,run,val){
-  const t=teams.find(x=>x.id===id);if(!t)return;t[run]=val;save();
+  const t=teams.find(x=>x.id===id);if(!t)return;
+  t[run]=val;
+  // Update avg display instantly — no lag
   const a=avg(t);const el=document.getElementById('avg-'+id);
   if(el){el.textContent=a!==null?ft(a):'—';el.className='avg-num'+(a!==null?'':' empty');}
+  // Debounce the expensive save + sync
+  clearTimeout(_saveDebounce);
+  _saveDebounce = setTimeout(()=>save(), 600);
 }
 function delTeam(id){if(!confirm('Mannschaft wirklich löschen?'))return;teams=teams.filter(x=>x.id!==id);save();renderAdmin();}
 
@@ -1327,7 +1337,6 @@ function renderResults(){
     const rank=i+1;
     const isFirst=rank===1;
     const pc=isFirst?'rp1':rank===2?'rp2':rank===3?'rp3':'rpn';
-    const timeStr=hasBoth?ft(a):'';
     const bobScale=isFirst?'transform:scale(1.32);transform-origin:left center':'';
     return`<div class="lane${isFirst?' lane-first':''}">
       <div class="lane-line"></div>
@@ -1337,7 +1346,7 @@ function renderResults(){
           ${bobSVG(t)}
           <div class="bob-below">
             <div class="bob-name">${t.name}</div>
-            ${timeStr?`<span class="bob-time">${timeStr}</span>`:''}
+
           </div>
         </div>
       </div>
@@ -1345,12 +1354,14 @@ function renderResults(){
   }).join('');
   rl.innerHTML=r.map((t,i)=>{
     const a=avg(t);const rank=i+1;
-    const hasBoth=pt(t.run1)!==null&&pt(t.run2)!==null;
+    const r1=pt(t.run1),r2=pt(t.run2);
+    const bestTime=a!==null?ft(a):(r1!==null?ft(r1):(r2!==null?ft(r2):null));
+    const timeLabel=a!==null?'Ø '+ft(a):(r1!==null?'L1 '+ft(r1):(r2!==null?'L2 '+ft(r2):'—'));
     const m=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
     return`<div class="panel-row">
       <div class="panel-rank" style="color:${rank===1?'#f59e0b':rank===2?'#94a3b8':rank===3?'#b45309':'#6b7280'}">${m||rank}</div>
       <div class="panel-av">${emblInner(t,28,5)}</div>
-      <div class="panel-info"><div class="panel-name">${t.name}</div><div class="panel-t">${hasBoth?ft(a):'—'}</div></div>
+      <div class="panel-info"><div class="panel-name">${t.name}</div><div class="panel-t">${timeLabel}</div></div>
     </div>`;
   }).join('');
   requestAnimationFrame(()=>{
