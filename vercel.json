@@ -1,4 +1,5 @@
 {
   "buildCommand": null,
-  "outputDirectory": "Bobanschub"
+  "outputDirectory": ".",
+  "cleanUrls": true
 }
