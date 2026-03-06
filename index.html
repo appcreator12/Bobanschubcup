@@ -51,12 +51,30 @@ nav {
 .team-list { display: flex; flex-direction: column; gap: 8px; }
 
 .team-row {
-  display: grid; grid-template-columns: 58px 1fr 160px 160px 80px;
-  align-items: center; gap: 14px;
+  display: grid; grid-template-columns: 22px 30px 54px 1fr 160px 160px 80px;
+  align-items: center; gap: 12px;
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 14px 18px; transition: border-color 0.2s;
+  border-radius: 14px; padding: 12px 16px;
+  transition: border-color 0.2s, opacity 0.2s, box-shadow 0.2s;
+  cursor: default; user-select: none;
 }
 .team-row:hover { border-color: var(--border-active); }
+.team-row.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); background: var(--surface2); }
+.team-row.dragging  { opacity: 0.35; }
+
+.drag-handle {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 6px 2px; cursor: grab; color: var(--muted);
+  border-radius: 6px; transition: color 0.15s;
+}
+.drag-handle:active { cursor: grabbing; }
+.drag-handle:hover { color: var(--text); }
+.drag-handle span { display: block; width: 14px; height: 2px; background: currentColor; border-radius: 2px; }
+
+.team-num {
+  font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 700;
+  color: var(--muted); text-align: center; min-width: 22px;
+}
 
 .avatar {
   width: 50px; height: 50px; border-radius: 11px; overflow: hidden;
@@ -87,10 +105,14 @@ nav {
 .time-inp {
   background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
   padding: 8px 10px; color: var(--text); font-family: 'JetBrains Mono', monospace;
-  font-size: 0.95rem; font-weight: 600; width: 100%; text-align: center; transition: border-color 0.18s, background 0.18s;
+  font-size: 0.95rem; font-weight: 600; width: 100%; text-align: center;
+  transition: border-color 0.18s, background 0.18s;
+  -moz-appearance: textfield; appearance: textfield;
 }
+.time-inp::-webkit-inner-spin-button,
+.time-inp::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .time-inp:focus { outline: none; border-color: var(--accent); background: var(--accent-glow); }
-.time-inp::placeholder { color: rgba(255,255,255,0.1); font-weight: 400; }
+.time-inp::placeholder { color: rgba(255,255,255,0.15); font-weight: 400; }
 
 .avg-cell { text-align: center; }
 .avg-num { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 600; color: var(--gold); }
@@ -122,10 +144,14 @@ nav {
 .pdf-btn:hover { background: rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.7); }
 .pdf-btn-gold { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.1); color: #fbbf24; }
 .pdf-btn-gold:hover { background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.7); }
+.pdf-btn-green { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.1); color: #34d399; }
+.pdf-btn-green:hover { background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.7); }
 body.results-mode .pdf-btn { color: #2563eb; border-color: rgba(37,99,235,0.35); background: rgba(37,99,235,0.07); }
 body.results-mode .pdf-btn:hover { background: rgba(37,99,235,0.14); }
 body.results-mode .pdf-btn-gold { color: #b45309; border-color: rgba(180,83,9,0.35); background: rgba(245,158,11,0.07); }
 body.results-mode .pdf-btn-gold:hover { background: rgba(245,158,11,0.14); }
+body.results-mode .pdf-btn-green { color: #059669; border-color: rgba(5,150,105,0.35); background: rgba(16,185,129,0.07); }
+body.results-mode .pdf-btn-green:hover { background: rgba(16,185,129,0.14); }
 
 /* ══ LIGHT THEME: Results page ══ */
 body.results-mode {
@@ -263,9 +289,9 @@ body.results-mode .sync-status.status-off {
   text-shadow: 0 0 8px rgba(59,130,246,0.9);
 }
 
-.track-lanes-wrap { position: relative; padding: 12px 90px 12px 20px; display: flex; flex-direction: column; gap: 0; }
+.track-lanes-wrap { position: relative; padding: 12px 90px 12px 20px; display: flex; flex-direction: column; gap: 0; overflow: visible; }
 
-.lane { position: relative; height: 56px; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; }
+.lane { position: relative; height: 56px; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; overflow: visible; }
 .lane.lane-first { height: 72px; }
 .lane-line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14) 30%, rgba(255,255,255,0.2) 70%, transparent); }
 
@@ -274,9 +300,10 @@ body.results-mode .sync-status.status-off {
   position: absolute; z-index: 5;
   transition: left 1.4s cubic-bezier(0.22,0.61,0.36,1);
   display: flex; flex-direction: row; align-items: center; gap: 6px;
+  overflow: visible;
 }
 .bob-wrap.bob-first { z-index: 6; transform-origin: left center; }
-.bob-svg-outer { position: relative; width: 90px; height: 40px; flex-shrink: 0; }
+.bob-svg-outer { position: relative; width: 90px; height: 40px; flex-shrink: 0; overflow: visible; }
 
 /* rank on the LEFT */
 .rank-left {
@@ -422,7 +449,8 @@ body.results-mode .sync-status.status-off {
 
 @media (max-width: 640px) {
   /* Admin */
-  .team-row { grid-template-columns: 50px 1fr; }
+  .team-row { grid-template-columns: 18px 24px 44px 1fr; }
+  .time-block, .avg-cell { grid-column: 1/-1; }
   .time-block, .avg-cell { grid-column: 1/-1; }
 
   /* Results banner */
@@ -450,7 +478,7 @@ body.results-mode .sync-status.status-off {
   .lane { height: 46px; }
   .lane.lane-first { height: 60px; }
   .bob-svg-outer { width: 70px !important; height: 32px !important; }
-  .bob-name { font-size: 0.52rem; max-width: 72px; }
+  .bob-name { font-size: 0.52rem; }
   .bob-time { font-size: 0.5rem; }
   .rank-left { width: 24px; }
   .rank-pill { font-size: 0.55rem; padding: 2px 4px; min-width: 20px; }
@@ -525,6 +553,7 @@ body.results-mode .sync-status.status-off {
       <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
         <span class="run-chip" id="runChip"></span>
         <span id="syncStatus" class="sync-status status-off" onclick="if(!isResultsView)openSetup()" title="Live-Sync einrichten" style="cursor:pointer">💾 Nur lokal</span>
+        <button class="pdf-btn pdf-btn-green" onclick="downloadStartaufstellung()" title="Startreihenfolge als PDF">🚦 Startaufstellung</button>
         <button class="pdf-btn" onclick="downloadErgebnisse()" title="Ergebnistabelle als PDF">📄 Endergebnisse</button>
         <button class="pdf-btn pdf-btn-gold" onclick="downloadUrkunden()" title="Urkunden für alle Teams">🏆 Urkunden</button>
       </div>
@@ -957,9 +986,13 @@ function gotoPage(p,el){
 function renderAdmin(){
   const list=document.getElementById('teamList');
   if(!teams.length){list.innerHTML=`<div class="empty"><div class="empty-icon">🛷</div>Noch keine Mannschaften.<br>Füge die erste hinzu.</div>`;return;}
-  list.innerHTML=teams.map(t=>{
+  list.innerHTML=teams.map((t,idx)=>{
     const a=avg(t);
-    return`<div class="team-row" id="tr-${t.id}">
+    return`<div class="team-row" id="tr-${t.id}" draggable="true" data-id="${t.id}">
+      <div class="drag-handle" title="Ziehen zum Sortieren">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="team-num">${idx+1}</div>
       <div class="avatar" onclick="triggerAv(${t.id})" title="Bild ändern">
         ${emblInner(t,50,9)}
         <div class="avatar-hint">Ändern</div>
@@ -973,13 +1006,13 @@ function renderAdmin(){
       </div>
       <div class="time-block">
         <div class="time-label">Lauf 1</div>
-        <input class="time-inp" type="number" step="0.001" min="0" placeholder="0.000"
+        <input class="time-inp" type="text" inputmode="decimal" placeholder="0.000"
           value="${t.run1}" oninput="upd(${t.id},'run1',this.value)"
           style="${t.run1?'border-color:'+t.color+'90':''}">
       </div>
       <div class="time-block">
         <div class="time-label">Lauf 2</div>
-        <input class="time-inp" type="number" step="0.001" min="0" placeholder="0.000"
+        <input class="time-inp" type="text" inputmode="decimal" placeholder="0.000"
           value="${t.run2}" oninput="upd(${t.id},'run2',this.value)"
           style="${t.run2?'border-color:'+t.color+'90':''}">
       </div>
@@ -993,7 +1026,7 @@ function renderAdmin(){
     </div>`;
   }).join('');
   // Attach file listeners after DOM update
-  setTimeout(attachAvatarListeners, 0);
+  setTimeout(()=>{ attachAvatarListeners(); initDragDrop(); }, 0);
 }
 
 function triggerAv(id){
@@ -1066,6 +1099,85 @@ function upd(id,run,val){
   if(el){el.textContent=a!==null?ft(a):'—';el.className='avg-num'+(a!==null?'':' empty');}
 }
 function delTeam(id){if(!confirm('Mannschaft wirklich löschen?'))return;teams=teams.filter(x=>x.id!==id);save();renderAdmin();}
+
+// ── DRAG & DROP REORDER ──
+let _dragId = null, _touchClone = null, _touchDragId = null;
+
+function initDragDrop(){
+  const list = document.getElementById('teamList');
+  list.querySelectorAll('.team-row').forEach(row=>{
+    const id = +row.dataset.id;
+
+    // ── Desktop HTML5 DnD ──
+    row.addEventListener('dragstart', e=>{
+      _dragId = id;
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    row.addEventListener('dragend', ()=>{
+      row.classList.remove('dragging');
+      list.querySelectorAll('.team-row').forEach(r=>r.classList.remove('drag-over'));
+    });
+    row.addEventListener('dragover', e=>{
+      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      list.querySelectorAll('.team-row').forEach(r=>r.classList.remove('drag-over'));
+      if(_dragId !== id) row.classList.add('drag-over');
+    });
+    row.addEventListener('drop', e=>{
+      e.preventDefault();
+      if(_dragId === null || _dragId === id) return;
+      moveTeam(_dragId, id);
+      _dragId = null;
+    });
+
+    // ── Mobile Touch DnD ──
+    const handle = row.querySelector('.drag-handle');
+    if(!handle) return;
+    handle.addEventListener('touchstart', e=>{
+      e.preventDefault();
+      _touchDragId = id;
+      row.classList.add('dragging');
+      // ghost clone
+      _touchClone = row.cloneNode(true);
+      _touchClone.style.cssText = `position:fixed;top:0;left:0;width:${row.offsetWidth}px;opacity:0.85;pointer-events:none;z-index:9999;border-radius:14px;background:var(--surface);box-shadow:0 8px 24px rgba(0,0,0,0.5);`;
+      document.body.appendChild(_touchClone);
+      const t = e.touches[0];
+      _touchClone.style.transform = `translate(${t.clientX - row.offsetWidth/2}px, ${t.clientY - 30}px)`;
+    },{passive:false});
+    handle.addEventListener('touchmove', e=>{
+      e.preventDefault();
+      if(!_touchClone) return;
+      const t = e.touches[0];
+      _touchClone.style.transform = `translate(${t.clientX - _touchClone.offsetWidth/2}px, ${t.clientY - 30}px)`;
+      // find row under finger
+      _touchClone.style.display='none';
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      _touchClone.style.display='';
+      const target = el && el.closest('.team-row');
+      list.querySelectorAll('.team-row').forEach(r=>r.classList.remove('drag-over'));
+      if(target && +target.dataset.id !== _touchDragId) target.classList.add('drag-over');
+    },{passive:false});
+    handle.addEventListener('touchend', e=>{
+      if(_touchClone){ _touchClone.remove(); _touchClone=null; }
+      row.classList.remove('dragging');
+      list.querySelectorAll('.team-row').forEach(r=>r.classList.remove('drag-over'));
+      const t = e.changedTouches[0];
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const target = el && el.closest('.team-row');
+      if(target && +target.dataset.id !== _touchDragId) moveTeam(_touchDragId, +target.dataset.id);
+      _touchDragId = null;
+    });
+  });
+}
+
+function moveTeam(fromId, toId){
+  const fi = teams.findIndex(t=>t.id===fromId);
+  const ti = teams.findIndex(t=>t.id===toId);
+  if(fi<0||ti<0) return;
+  const [item] = teams.splice(fi,1);
+  teams.splice(ti,0,item);
+  save(); renderAdmin();
+}
 
 // ── MODAL ──
 function openModal(){
@@ -1337,6 +1449,96 @@ function medalLabel(platz){
   if(platz === 2) return '🥈  2. Platz';
   if(platz === 3) return '🥉  3. Platz';
   return platz + '. Platz';
+}
+
+// ── Startaufstellung als Tabelle (Reihenfolge = Eingabereihenfolge) ──
+async function downloadStartaufstellung(){
+  const { jsPDF } = window.jspdf;
+  if(!jsPDF){ alert('PDF-Bibliothek wird noch geladen, bitte kurz warten.'); return; }
+  if(!teams.length){ alert('Noch keine Mannschaften vorhanden.'); return; }
+
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = doc.internal.pageSize.getWidth();
+
+  // ── Header ──
+  doc.setFillColor(10, 20, 50);
+  doc.rect(0, 0, W, 52, 'F');
+  doc.setFillColor(16, 185, 129);
+  doc.rect(0, 50, W, 3, 'F');
+
+  // Logo
+  try{
+    const logoB64 = document.querySelector('#resultsPage img[alt]') ?
+      document.querySelector('#resultsPage img').src :
+      null;
+    if(logoB64) doc.addImage(logoB64, 'PNG', 12, 12, 72, 26);
+  }catch(e){}
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18); doc.setTextColor(255,255,255);
+  doc.text('BOBANSCHUBCUP 2026', W - 14, 22, { align: 'right' });
+  doc.setFontSize(11); doc.setTextColor(180,200,230);
+  doc.text('Startaufstellung · RC Riesa-Elbland', W - 14, 32, { align: 'right' });
+  doc.setFontSize(9); doc.setTextColor(100,130,180);
+  doc.text(dateStr, W - 14, 42, { align: 'right' });
+
+  // ── Green accent title band ──
+  doc.setFillColor(16, 185, 129);
+  doc.rect(0, 55, W, 10, 'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11); doc.setTextColor(255,255,255);
+  doc.text('🚦  STARTREIHENFOLGE', W/2, 61.5, { align: 'center' });
+
+  // ── Table ──
+  const rows = teams.map((t, i) => [
+    String(i + 1) + '.',
+    t.name,
+    t.run1 ? ft(pt(t.run1)) : '–',
+    t.run2 ? ft(pt(t.run2)) : '–',
+    avg(t) !== null ? ft(avg(t)) : '–'
+  ]);
+
+  doc.autoTable({
+    startY: 68,
+    head: [['Start', 'Mannschaft', 'Lauf 1', 'Lauf 2', 'Ø Mittelwert']],
+    body: rows,
+    theme: 'grid',
+    headStyles: {
+      fillColor: [10, 20, 50],
+      textColor: [180, 200, 230],
+      fontStyle: 'bold',
+      fontSize: 9,
+      cellPadding: 4,
+      lineColor: [16, 185, 129],
+      lineWidth: 0.3,
+    },
+    bodyStyles: {
+      fontSize: 10,
+      cellPadding: 4.5,
+      fontStyle: 'normal',
+      textColor: [30, 41, 59],
+    },
+    alternateRowStyles: { fillColor: [240, 253, 250] },
+    columnStyles: {
+      0: { cellWidth: 16, halign: 'center', fontStyle: 'bold' },
+      1: { cellWidth: 'auto' },
+      2: { cellWidth: 28, halign: 'center', font: 'courier' },
+      3: { cellWidth: 28, halign: 'center', font: 'courier' },
+      4: { cellWidth: 32, halign: 'center', fontStyle: 'bold', font: 'courier' },
+    },
+
+    margin: { left: 14, right: 14 },
+  });
+
+  // ── Footer ──
+  const finalY = doc.lastAutoTable.finalY + 8;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8); doc.setTextColor(148,163,184);
+  doc.text(`Erstellt am ${dateStr} · Bobanschubcup 2026 · RC Riesa-Elbland`, W/2, finalY, { align: 'center' });
+
+  doc.save('Bobanschubcup-2026-Startaufstellung.pdf');
 }
 
 // ── Endergebnisse als Tabelle ──
