@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bobanschubcup 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #111318;
+  --surface2: #181c24;
+  --border: rgba(255,255,255,0.07);
+  --border-active: rgba(255,255,255,0.18);
+  --text: #f0f2f5;
+  --muted: #6b7280;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59,130,246,0.18);
+  --gold: #f59e0b;
+  --silver: #94a3b8;
+  --bronze: #b45309;
+  --danger: #ef4444;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+/* NAV */
+nav {
+  height: 58px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; border-bottom: 1px solid var(--border);
+  background: rgba(10,12,16,0.92); backdrop-filter: blur(16px);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+.logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+.tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; gap: 2px; }
+.tab { padding: 5px 16px; border-radius: 7px; border: none; background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 500; cursor: pointer; transition: all 0.18s; }
+.tab.active { background: var(--surface2); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ══ ADMIN ══ */
+.admin-wrap { max-width: 840px; margin: 0 auto; padding: 36px 20px 80px; }
+.section-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; }
+.section-sub { color: var(--muted); font-size: 0.83rem; margin-top: 4px; margin-bottom: 28px; }
+
+.team-list { display: flex; flex-direction: column; gap: 8px; }
+
+.team-row {
+  display: grid; grid-template-columns: 58px 1fr 160px 160px 80px;
+  align-items: center; gap: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 18px; transition: border-color 0.2s;
+}
+.team-row:hover { border-color: var(--border-active); }
+
+.avatar {
+  width: 50px; height: 50px; border-radius: 11px; overflow: hidden;
+  display: flex; align-items: center; justify-content: center; font-size: 1.55rem;
+  flex-shrink: 0; cursor: pointer; position: relative;
+  background: var(--surface2); border: 1.5px solid var(--border); transition: border-color 0.2s;
+}
+.avatar:hover { border-color: var(--border-active); }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-hint {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.65);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; color: #fff; opacity: 0; transition: opacity 0.15s;
+  border-radius: 9px; letter-spacing: 0.3px; font-weight: 500;
+}
+.avatar:hover .avatar-hint { opacity: 1; }
+.hidden-file { display: none; }
+
+.team-name-txt { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+.team-badge {
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 3px;
+  font-size: 0.7rem; color: var(--muted); background: var(--surface2);
+  padding: 2px 7px; border-radius: 20px;
+}
+
+.time-block { display: flex; flex-direction: column; gap: 4px; }
+.time-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); }
+.time-inp {
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; color: var(--text); font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem; font-weight: 600; width: 100%; text-align: center; transition: border-color 0.18s, background 0.18s;
+}
+.time-inp:focus { outline: none; border-color: var(--accent); background: var(--accent-glow); }
+.time-inp::placeholder { color: rgba(255,255,255,0.1); font-weight: 400; }
+
+.avg-cell { text-align: center; }
+.avg-num { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 600; color: var(--gold); }
+.avg-num.empty { color: var(--muted); font-size: 0.78rem; font-weight: 400; }
+.avg-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-top: 2px; }
+.del-btn { background: none; border: none; color: var(--muted); cursor: pointer; padding: 7px; border-radius: 7px; transition: color 0.15s, background 0.15s; display: flex; align-items: center; justify-content: center; margin: 4px auto 0; }
+.del-btn:hover { color: var(--danger); background: rgba(239,68,68,0.08); }
+
+.add-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 13px; background: transparent;
+  border: 1.5px dashed rgba(59,130,246,0.3); border-radius: 14px;
+  color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500;
+  cursor: pointer; margin-top: 8px; transition: all 0.18s;
+}
+.add-btn:hover { background: var(--accent-glow); border-color: var(--accent); }
+
+.empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
+.empty-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.35; }
+
+/* ══ RESULTS ══ */
+.results-banner {
+  padding: 24px 28px 18px; display: flex; align-items: flex-end;
+  justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+.results-h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.9rem; letter-spacing: -1px; line-height: 1; }
+.results-h1 span { color: var(--accent); }
+.results-sub { color: var(--muted); font-size: 0.82rem; margin-top: 5px; }
+.live-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+  color: #f87171; font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 12px; border-radius: 20px;
+}
+.run-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.35);
+  color: #93c5fd; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; padding: 5px 12px; border-radius: 20px;
+  font-family: 'Syne', sans-serif;
+}
+.run-chip:empty { display: none; }
+.live-dot { width: 6px; height: 6px; background: #f87171; border-radius: 50%; animation: blink 1.2s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+/* Track */
+.track-outer {
+  position: relative; overflow: hidden; min-height: 380px;
+  background: linear-gradient(180deg,
+    #060d18 0%, #0b1e36 8%, #0f2e58 18%,
+    #1254a0 30%, #2e82c8 44%,
+    #7dc4e8 56%, #c5e8f7 70%, #e8f6fd 100%
+  );
+}
+.track-outer::after {
+  content: ''; position: absolute; inset: 45% 0 0;
+  background: repeating-linear-gradient(-2deg, transparent, transparent 28px, rgba(255,255,255,0.03) 28px, rgba(255,255,255,0.03) 30px);
+  pointer-events: none;
+}
+/* Modern finish gate */
+.finish-gate {
+  position: absolute; right: 40px; top: 0; bottom: 0;
+  width: 52px; z-index: 10; pointer-events: none;
+}
+/* Wide checkered column */
+.finish-gate-checks {
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  background: repeating-conic-gradient(#fff 0% 25%, #111 0% 50%) 0 0 / 9px 9px;
+  opacity: 0.92;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.25), 0 0 24px rgba(255,255,255,0.4), 0 0 50px rgba(59,130,246,0.25);
+}
+/* Subtle glow layer on top */
+.finish-gate-bar {
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 18px; transform: translateX(-50%);
+  background: linear-gradient(180deg,
+    transparent 0%, rgba(255,255,255,0.08) 40%,
+    rgba(255,255,255,0.08) 60%, transparent 100%);
+  pointer-events: none;
+}
+/* Animated glow pulse */
+.finish-glow-line {
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--accent) 25%, var(--accent) 75%, transparent);
+  opacity: 0; animation: finishPulse 2.5s ease-in-out infinite;
+}
+@keyframes finishPulse { 0%,100%{opacity:0} 50%{opacity:0.55} }
+/* Checkered flag on top */
+.finish-flag-top {
+  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  font-size: 2rem; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+/* ZIEL label below flag */
+.finish-label {
+  position: absolute; top: 36px; left: 50%; transform: translateX(-50%);
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.85); white-space: nowrap;
+  text-shadow: 0 0 8px rgba(59,130,246,0.9);
+}
+
+.track-lanes-wrap { position: relative; padding: 12px 90px 40px 20px; display: flex; flex-direction: column; gap: 0; }
+
+.lane { position: relative; height: 80px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
+.lane-line { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14) 30%, rgba(255,255,255,0.2) 70%, transparent); }
+
+/* bob-wrap: rank pill LEFT | bob SVG | caption below bob (name+time) */
+.bob-wrap {
+  position: absolute;
+  transition: left 1.4s cubic-bezier(0.22,0.61,0.36,1);
+  display: flex; flex-direction: row; align-items: center; gap: 6px;
+}
+.bob-svg-outer { position: relative; width: 128px; height: 56px; flex-shrink: 0; }
+
+/* rank on the LEFT */
+.rank-left {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; width: 36px;
+}
+.rank-pill {
+  font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 800;
+  padding: 3px 6px; border-radius: 8px; white-space: nowrap;
+  display: inline-block; text-align: center; min-width: 28px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+.rp1 { background: #f59e0b; color: #1a1a1a; }
+.rp2 { background: #94a3b8; color: #1a1a1a; }
+.rp3 { background: #b45309; color: #fff; }
+.rpn { background: rgba(20,20,30,0.75); color: #ccc; border: 1px solid rgba(255,255,255,0.12); }
+
+/* caption below bob */
+.bob-below {
+  position: absolute;
+  bottom: -22px; left: 0; width: 128px;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.bob-name { font-family: 'Syne', sans-serif; font-size: 0.62rem; font-weight: 700; color: #1a2a3a; text-shadow: 0 1px 2px rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 124px; }
+.bob-time { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; font-weight: 600; color: #1e3a5f; white-space: nowrap; }
+.team-name-inp {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
+  background: transparent; border: none; border-bottom: 1.5px solid transparent;
+  color: var(--text); padding: 2px 0; width: 100%; cursor: text;
+  transition: border-color 0.18s;
+}
+.team-name-inp:hover { border-bottom-color: var(--border-active); }
+.team-name-inp:focus { outline: none; border-bottom-color: var(--accent); background: transparent; }
+
+/* Ranking panel */
+.rank-panel {
+  position: fixed; right: 16px; top: 50%; transform: translateY(-50%);
+  width: 200px; background: rgba(10,12,16,0.9); border: 1px solid var(--border-active);
+  border-radius: 16px; padding: 14px; backdrop-filter: blur(20px); z-index: 50;
+  max-height: 85vh; display: flex; flex-direction: column;
+}
+.panel-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.82rem; padding-bottom: 9px; margin-bottom: 6px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+#rankList { overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: var(--border-active) transparent; }
+.panel-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.panel-row:last-child { border-bottom: none; }
+.panel-rank { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; width: 20px; text-align: center; flex-shrink: 0; }
+.panel-av { width: 28px; height: 28px; border-radius: 6px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: var(--surface2); }
+.panel-av img { width: 100%; height: 100%; object-fit: cover; }
+.panel-info { flex: 1; min-width: 0; }
+.panel-name { font-size: 0.78rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.panel-t { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+
+/* ══ MODAL ══ */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--border-active); border-radius: 20px; padding: 26px 26px 22px; width: 92%; max-width: 410px; animation: mIn 0.24s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes mIn { from{transform:scale(0.92) translateY(10px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+.modal-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.4px; margin-bottom: 20px; }
+.field { margin-bottom: 15px; }
+.field-label { display: block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+.field-input { width: 100%; padding: 9px 12px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; transition: border-color 0.18s; }
+.field-input:focus { outline: none; border-color: var(--accent); }
+
+.mode-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
+.mode-btn { flex: 1; padding: 7px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+.mode-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+.emoji-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+.em-opt { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; cursor: pointer; background: var(--bg); border: 1.5px solid var(--border); transition: all 0.14s; }
+.em-opt:hover { border-color: var(--border-active); }
+.em-opt.sel { border-color: var(--accent); background: var(--accent-glow); }
+
+.photo-drop {
+  border: 1.5px dashed var(--border-active); border-radius: 12px;
+  padding: 18px; text-align: center; cursor: pointer; transition: all 0.18s;
+}
+.photo-drop:hover { border-color: var(--accent); background: var(--accent-glow); }
+.photo-preview-img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; margin: 0 auto 8px; display: block; }
+.photo-placeholder-icon { font-size: 1.8rem; opacity: 0.35; margin-bottom: 6px; }
+.photo-hint-txt { font-size: 0.76rem; color: var(--muted); }
+.photo-hint-txt strong { color: var(--accent); }
+
+.color-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.col-opt { width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 2.5px solid transparent; transition: all 0.15s; }
+.col-opt.sel { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 8px rgba(255,255,255,0.4); }
+
+.modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+.mbtn { flex: 1; padding: 10px; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.18s; border: 1.5px solid transparent; }
+.mbtn-p { background: var(--accent); color: #fff; } .mbtn-p:hover { background: #2563eb; }
+.mbtn-s { background: transparent; color: var(--muted); border-color: var(--border); } .mbtn-s:hover { color: var(--text); border-color: var(--border-active); }
+
+/* Wizard steps */
+#wizSteps { display:flex; align-items:center; gap:0; }
+.wiz-step {
+  flex:1; text-align:center; padding:7px 4px; border-radius:8px; cursor:pointer;
+  font-size:0.75rem; font-weight:600; color:var(--muted);
+  transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:3px;
+}
+.wiz-step span {
+  width:22px; height:22px; border-radius:50%; background:var(--surface2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:0.72rem; font-weight:700; transition:all 0.2s;
+}
+.wiz-step.active { color:var(--accent); }
+.wiz-step.active span { background:var(--accent); color:#fff; }
+.wiz-step.done { color:var(--text); }
+.wiz-step.done span { background:#10b981; color:#fff; }
+.wiz-sep { color:var(--border-active); font-size:1rem; padding:0 2px; }
+.sync-status {
+  font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+  font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap;
+}
+.status-ok  { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #6ee7b7; }
+.status-err { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.35);  color: #fca5a5; }
+.status-off { background: rgba(107,114,128,0.15); border: 1px solid rgba(107,114,128,0.3); color: var(--muted); }
+.qr-card {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  background: var(--surface); border: 1px solid var(--border-active);
+  border-radius: 20px; padding: 28px 32px; max-width: 320px; margin: 0 auto;
+}
+.qr-label { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem; color: var(--text); letter-spacing: -0.3px; }
+.qr-img { width: 180px; height: 180px; border-radius: 12px; border: 2px solid var(--border-active); }
+.qr-url { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); word-break: break-all; text-align: center; max-width: 240px; }
+.qr-open-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 9px;
+  background: var(--accent); color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+  text-decoration: none; transition: background 0.18s;
+}
+.qr-open-btn:hover { background: #2563eb; }
+.qr-error { font-size: 0.8rem; color: var(--muted); text-align: center; padding: 20px; }
+
+@media (max-width: 640px) {
+  .team-row { grid-template-columns: 50px 1fr; }
+  .time-block, .avg-cell { grid-column: 1/-1; }
+  .rank-panel { display: none; }
+  .results-h1 { font-size: 1.4rem; }
+  .track-lanes-wrap { padding-right: 50px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><div class="logo-dot"></div>Bobanschubcup 2026</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span id="syncStatus" class="sync-status status-off" onclick="openSetup()" title="Live-Sync einrichten" style="cursor:pointer">💾 Nur lokal</span>
+    <div class="tabs">
+      <button class="tab" onclick="gotoPage('results',this)">🏁 Ergebnisse</button>
+      <button class="tab active" onclick="gotoPage('admin',this)">⏱ Zeitnahme</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ADMIN -->
+<div id="adminPage" class="page active">
+  <div class="admin-wrap">
+    <div class="section-title">Zeitnahme</div>
+    <div class="section-sub">Bobanschubcup 2026 · RC Riesa-Elbland · Zeiten für Lauf 1 &amp; 2 eintragen</div>
+    <div class="team-list" id="teamList"></div>
+    <button class="add-btn" onclick="openModal()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Mannschaft hinzufügen
+    </button>
+    <div id="qrBlock" style="margin-top:40px"></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="resultsPage" class="page">
+  <div class="results-banner">
+    <div>
+      <div class="results-h1">Bobanschubcup <span>2026</span></div>
+      <div class="results-sub">RC Riesa-Elbland · Live-Rangliste</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <span class="live-chip"><span class="live-dot"></span>Live</span>
+      <span class="run-chip" id="runChip"></span>
+    </div>
+  </div>
+  <div class="track-outer">
+    <div class="finish-gate">
+      <div class="finish-flag-top">🏁</div>
+      <div class="finish-gate-checks"></div>
+      <div class="finish-gate-bar"></div>
+      <div class="finish-glow-line"></div>
+      <div class="finish-label">ZIEL</div>
+    </div>
+    <div class="track-lanes-wrap" id="trackLanes"></div>
+  </div>
+  <div class="rank-panel" id="rankPanel">
+    <div class="panel-title">🏆 Ranking</div>
+    <div id="rankList"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title">Mannschaft hinzufügen</div>
+    <div class="field">
+      <label class="field-label">Teamname</label>
+      <input class="field-input" id="mName" type="text" placeholder="z. B. Die Eisteufel" maxlength="22">
+    </div>
+    <div class="field">
+      <label class="field-label">Emblem</label>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="modeEmoji" onclick="setMode('emoji')">Emoji</button>
+        <button class="mode-btn" id="modePhoto" onclick="setMode('photo')">Foto / Mediathek</button>
+      </div>
+      <div id="emojiSection"><div class="emoji-grid" id="emojiGrid"></div></div>
+      <div id="photoSection" style="display:none">
+        <label class="photo-drop" for="photoInput" id="photoDrop">
+          <img id="photoPreviewImg" class="photo-preview-img" alt="" style="display:none">
+          <div id="photoPlaceholder">
+            <div class="photo-placeholder-icon">📷</div>
+            <div class="photo-hint-txt">Tippen zum Auswählen<br><strong>Foto aus Mediathek</strong></div>
+          </div>
+        </label>
+        <input type="file" id="photoInput" class="hidden-file" accept="image/*">
+        <div id="photoError" style="display:none;color:#f87171;font-size:0.78rem;margin-top:6px;text-align:center"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-s" onclick="closeModal()">Abbrechen</button>
+      <button class="mbtn mbtn-p" onclick="addTeam()">Hinzufügen</button>
+    </div>
+  </div>
+</div>
+
+<!-- SYNC SETUP MODAL -->
+<div class="overlay" id="setupModal">
+  <div class="modal" style="max-width:440px">
+
+    <!-- Step indicator -->
+    <div id="wizSteps" style="display:flex;gap:0;margin-bottom:22px">
+      <div class="wiz-step active" id="ws1"><span>1</span>Account</div>
+      <div class="wiz-sep">›</div>
+      <div class="wiz-step" id="ws2"><span>2</span>API Key</div>
+      <div class="wiz-sep">›</div>
+      <div class="wiz-step" id="ws3"><span>3</span>Fertig</div>
+    </div>
+
+    <!-- STEP 1: Register only — no bin creation needed -->
+    <div id="wizPage1">
+      <div class="modal-title" style="margin-bottom:10px">Schritt 1 — Kostenlosen Account erstellen</div>
+      <p style="color:var(--muted);font-size:0.83rem;margin-bottom:16px;line-height:1.65">
+        JSONBin.io speichert die Ergebnisse kostenlos im Internet.<br>
+        <strong style="color:var(--text)">Die App erstellt die Datenbank automatisch</strong> — du musst nichts weiter tun.
+      </p>
+      <a href="https://jsonbin.io/login" target="_blank" class="mbtn mbtn-p"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;padding:12px;border-radius:10px;font-size:0.9rem;margin-bottom:16px">
+        🌐 jsonbin.io öffnen &amp; kostenlos registrieren
+      </a>
+      <div style="background:var(--surface2);border-radius:10px;padding:11px 14px;font-size:0.79rem;color:var(--muted);line-height:1.85">
+        <strong style="color:var(--text)">Registrierung:</strong> E-Mail eingeben → Passwort wählen → Fertig.<br>
+        <strong style="color:var(--text)">Kein Bin erstellen nötig</strong> — das erledigt die App automatisch.
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px">
+        <button class="mbtn mbtn-p" style="flex:0 0 auto;padding:8px 22px" onclick="wizGoto(2)">Account erstellt → Weiter →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Only API Key needed -->
+    <div id="wizPage2" style="display:none">
+      <div class="modal-title" style="margin-bottom:10px">Schritt 2 — API Key kopieren</div>
+      <p style="color:var(--muted);font-size:0.83rem;margin-bottom:14px;line-height:1.65">
+        Das ist der einzige Wert den du kopieren musst.
+      </p>
+      <div style="background:var(--surface2);border-radius:10px;padding:11px 14px;font-size:0.79rem;color:var(--muted);line-height:1.95;margin-bottom:14px">
+        <strong style="color:var(--text)">So findest du den Key:</strong><br>
+        1. Oben rechts auf dein <strong style="color:var(--text)">Profilbild</strong> klicken → <strong style="color:var(--text)">„API Keys"</strong><br>
+        2. <strong style="color:var(--text)">„+ ADD API KEY"</strong> → beliebigen Namen → bestätigen<br>
+        3. Den Key (<code style="color:var(--accent)">$2a$10$...</code>) kopieren und unten einfügen
+      </div>
+      <a href="https://jsonbin.io/api-keys" target="_blank"
+        style="display:flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;padding:9px;border-radius:9px;font-size:0.82rem;margin-bottom:14px;background:var(--surface2);color:var(--text);border:1px solid var(--border-active)">
+        🔑 Direkt zu jsonbin.io → API Keys
+      </a>
+      <div class="field">
+        <label class="field-label">Master Key hier einfügen</label>
+        <input class="field-input" id="fbApiKey" type="text" placeholder="$2a$10$..."
+          oninput="document.getElementById('wizConnectBtn').style.display=this.value.length>10?'flex':'none'">
+      </div>
+      <div id="wizConnectBtn" style="display:none;justify-content:space-between;margin-top:8px;gap:8px">
+        <button class="mbtn mbtn-s" style="flex:0 0 auto" onclick="wizGoto(1)">← Zurück</button>
+        <button class="mbtn mbtn-p" id="connectBtn" style="flex:1" onclick="saveSetup()">✓ Verbinden &amp; Datenbank erstellen</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Success -->
+    <div id="wizPage3" style="display:none;text-align:center">
+      <div style="font-size:3rem;margin-bottom:12px">✅</div>
+      <div class="modal-title" style="margin-bottom:8px">Live-Sync aktiv!</div>
+      <p style="color:var(--muted);font-size:0.83rem;margin-bottom:20px;line-height:1.65">
+        Der QR-Code enthält alle Zugangsdaten direkt eingebettet.<br>
+        <strong style="color:var(--text)">Kein Download, kein Re-Upload nötig.</strong><br>
+        Einfach QR-Code scannen — fertig.
+      </p>
+      <button class="mbtn mbtn-p" style="width:100%;margin-bottom:10px" onclick="closeSetup();renderQR()">🏁 QR-Code anzeigen</button>
+      <button class="mbtn mbtn-s" style="width:100%" onclick="closeSetup()">Schließen</button>
+    </div>
+
+    <!-- Disconnect -->
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:0.75rem;color:var(--muted)">Verbindung trennen:</span>
+      <button class="mbtn mbtn-s" onclick="clearSetup()" style="flex:0 0 auto;padding:5px 14px;font-size:0.78rem;color:var(--danger);border-color:rgba(239,68,68,0.3)">Trennen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let teams=[], nextId=1, selEmoji='😈', selColor='#3b82f6', photoDataUrl=null, emblMode='emoji';
+const EMOJIS=['😈','❄️','⚡','🚀','🦁','🐺','🦊','🐻','🦅','🐯','💎','🔥','🌊','⭐','🎯','🏆','🦄','🐲','👊','🎽'];
+const COLORS=[
+  '#e63946','#f4722b','#f59e0b','#eab308','#84cc16',
+  '#22c55e','#10b981','#14b8a6','#06b6d4','#0ea5e9',
+  '#3b82f6','#6366f1','#8b5cf6','#a855f7','#d946ef',
+  '#ec4899','#f43f5e','#be123c','#9f1239','#7f1d1d',
+  '#92400e','#78350f','#166534','#064e3b','#0c4a6e',
+  '#1e3a8a','#3730a3','#581c87','#4a044e','#831843',
+  '#134e4a','#1e40af','#365314','#713f12','#374151'
+];
+
+// ══════════════════════════════════════════════════════
+//  JSONBIN.IO SYNC  — einfachste Lösung, kein SDK
+//  Einrichtung: 1 kostenlosen Account, 1 Bin-ID kopieren
+// ══════════════════════════════════════════════════════
+
+// ▼▼▼ HIER JSONBin-Zugangsdaten eintragen (nach Einrichtung) ▼▼▼
+const SYNC_CONFIG = {
+  binId:  '',   // z.B. "6650a1234abc1234567890ab"
+  apiKey: '',   // z.B. "$2a$10$..."
+};
+// ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲
+
+const SYNC_KEY = 'bpch26_sync';
+let syncInterval = null;
+let lastSyncHash = '';
+
+// URL-safe base64 (avoids + / = issues in URL fragments)
+function b64enc(s){ return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,''); }
+function b64dec(s){ return atob(s.replace(/-/g,'+').replace(/_/g,'/')); }
+
+function syncConfig(){
+  if(SYNC_CONFIG.binId && SYNC_CONFIG.apiKey) return SYNC_CONFIG;
+  // Read from URL hash: #s=URLSAFE_BASE64(binId|apiKey)
+  try{
+    const h = window.location.hash;
+    if(h.startsWith('#s=')){
+      const parts = b64dec(h.slice(3)).split('|');
+      if(parts.length===2 && parts[0] && parts[1]){
+        SYNC_CONFIG.binId  = parts[0];
+        SYNC_CONFIG.apiKey = parts[1];
+        localStorage.setItem(SYNC_KEY, JSON.stringify({binId:parts[0],apiKey:parts[1]}));
+        return SYNC_CONFIG;
+      }
+    }
+  }catch(e){ console.warn('hash parse error',e); }
+  // Fall back to localStorage
+  try{
+    const d = JSON.parse(localStorage.getItem(SYNC_KEY)||'null');
+    if(d&&d.binId&&d.apiKey){
+      SYNC_CONFIG.binId=d.binId; SYNC_CONFIG.apiKey=d.apiKey; return SYNC_CONFIG;
+    }
+  }catch(e){}
+  return null;
+}
+function syncSaveConfig(cfg){
+  localStorage.setItem(SYNC_KEY, JSON.stringify(cfg));
+  SYNC_CONFIG.binId  = cfg.binId;
+  SYNC_CONFIG.apiKey = cfg.apiKey;
+}
+// syncReady: always need both binId and apiKey
+function syncReady(){ const c=syncConfig(); return !!(c&&c.binId&&c.apiKey); }
+function syncCanWrite(){ return syncReady(); }
+
+async function syncPush(){
+  if(!syncReady()) return;
+  const c = syncConfig();
+  try{
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${c.binId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type':'application/json', 'X-Master-Key': c.apiKey, 'X-Bin-Meta':'false' },
+      body: JSON.stringify({ teams, nextId })
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    setStatus('connected');
+  } catch(e){ console.warn('Sync push error:', e); setStatus('error'); }
+}
+
+async function syncPull(){
+  if(!syncReady()) return;
+  const c = syncConfig();
+  try{
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${c.binId}/latest`, {
+      headers: { 'X-Master-Key': c.apiKey, 'X-Bin-Meta':'false' }
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    const remote = d.record || d;
+    if(!remote || !remote.teams) return;
+    const hash = JSON.stringify(remote);
+    if(hash === lastSyncHash) return;
+    lastSyncHash = hash;
+    teams  = remote.teams;
+    nextId = remote.nextId || Math.max(0,...remote.teams.map(t=>t.id))+1;
+    setStatus('connected');
+    if(!isResultsView) renderAdmin();
+    if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
+  } catch(e){ console.warn('Sync pull error:', e); setStatus('error'); }
+}
+
+async function makeBinPublic(binId, apiKey){
+  // Set bin to public so reads work without key
+  try{
+    await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type':'application/json', 'X-Master-Key': apiKey,
+                 'X-Bin-Private':'false', 'X-Bin-Meta':'false' },
+      body: JSON.stringify({ teams, nextId })
+    });
+  }catch(e){ console.warn('makeBinPublic error:', e); }
+}
+
+function syncStart(){
+  if(syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(syncPull, 3000);
+  syncPull();
+}
+
+function save(){
+  const data = { teams, nextId };
+  try{ localStorage.setItem('bpch26', JSON.stringify(data)); }catch(e){}
+  lastSyncHash = JSON.stringify(data);
+  if(syncReady()) syncPush();
+}
+
+function load(){
+  try{
+    const d = JSON.parse(localStorage.getItem('bpch26')||'null');
+    if(d && d.teams){ teams=d.teams; nextId=d.nextId||1; }
+  }catch(e){}
+  if(!teams.length){
+    teams=[
+      {id:1,name:'Die Eisteufel',emoji:'\uD83D\uDE08',color:'#ef4444',photo:null,run1:'',run2:''},
+      {id:2,name:'Schneeflitzer',emoji:'\u2744\uFE0F',color:'#3b82f6',photo:null,run1:'',run2:''},
+      {id:3,name:'Blitzschlitten',emoji:'\u26A1',color:'#f59e0b',photo:null,run1:'',run2:''}
+    ];
+    nextId=4;
+  }
+}
+
+function setStatus(state){
+  const el = document.getElementById('syncStatus');
+  if(!el) return;
+  const map = {
+    connected: { text:'\u2601 Live-Sync aktiv',   cls:'status-ok'  },
+    error:     { text:'\u26A0 Sync-Fehler',        cls:'status-err' },
+    offline:   { text:'\uD83D\uDCBE Nur lokal',   cls:'status-off' },
+    setup:     { text:'\u2699 Sync einrichten',    cls:'status-off' },
+  };
+  const s = map[state]||map.offline;
+  el.textContent = s.text;
+  el.className   = 'sync-status ' + s.cls;
+}
+// ── Setup wizard ──
+function wizGoto(step){
+  [1,2,3].forEach(i=>{
+    document.getElementById('wizPage'+i).style.display = i===step?'block':'none';
+    const ws = document.getElementById('ws'+i);
+    ws.classList.remove('active','done');
+    if(i===step) ws.classList.add('active');
+    else if(i<step) ws.classList.add('done');
+  });
+}
+
+function openSetup(){
+  const cfg = syncConfig()||{};
+  document.getElementById('fbApiKey').value = cfg.apiKey||'';
+  const hasKey = (cfg.apiKey||'').length > 10;
+  document.getElementById('wizConnectBtn').style.display = hasKey ? 'flex' : 'none';
+  wizGoto(syncReady() ? 3 : 1);
+  document.getElementById('setupModal').classList.add('open');
+}
+function closeSetup(){ document.getElementById('setupModal').classList.remove('open'); }
+
+async function saveSetup(){
+  const apiKey = document.getElementById('fbApiKey').value.trim();
+  if(!apiKey){ alert('Bitte den API Key einfügen.'); return; }
+  const btn = document.getElementById('connectBtn');
+  if(btn){ btn.textContent='Erstelle Datenbank...'; btn.disabled=true; }
+
+  try{
+    // Validate key with a lightweight check
+    const testR = await fetch('https://api.jsonbin.io/v3/b?limit=1', {
+      headers:{ 'X-Master-Key': apiKey }
+    });
+    if(testR.status===401) throw new Error('API Key ungültig oder falsch kopiert.\n\nBitte nochmal unter jsonbin.io → API Keys kopieren.');
+
+    // Auto-create a new bin
+    const createR = await fetch('https://api.jsonbin.io/v3/b', {
+      method: 'POST',
+      headers:{ 'Content-Type':'application/json', 'X-Master-Key': apiKey, 'X-Bin-Name':'bobanschubcup2026' },
+      body: JSON.stringify({ teams, nextId })
+    });
+    if(!createR.ok) throw new Error('Datenbank konnte nicht erstellt werden (HTTP ' + createR.status + ')');
+    const created = await createR.json();
+    const binId = (created.metadata && created.metadata.id) || created.id;
+    if(!binId) throw new Error('Bin ID konnte nicht ausgelesen werden.');
+
+    syncSaveConfig({ binId, apiKey });
+    await makeBinPublic(binId, apiKey); // make readable without key → short QR URL
+    if(btn){ btn.textContent='✓ Verbinden & Datenbank erstellen'; btn.disabled=false; }
+    syncStart();
+    renderQR();
+    setStatus('connected');
+    wizGoto(3);
+  } catch(e){
+    if(btn){ btn.textContent='✓ Verbinden & Datenbank erstellen'; btn.disabled=false; }
+    alert('❌ Fehler:\n\n' + e.message);
+    setStatus('error');
+  }
+}
+
+function clearSetup(){
+  if(!confirm('Sync-Konfiguration löschen und nur lokal arbeiten?')) return;
+  localStorage.removeItem(SYNC_KEY);
+  SYNC_CONFIG.binId=''; SYNC_CONFIG.apiKey='';
+  if(syncInterval){ clearInterval(syncInterval); syncInterval=null; }
+  setStatus('offline');
+  closeSetup();
+  renderQR();
+}
+
+async function downloadConfigured(){
+  const cfg = syncConfig()||{};
+  const binId  = cfg.binId||'';
+  const apiKey = cfg.apiKey||'';
+  if(!binId||!apiKey){ alert('Keine Sync-Konfiguration vorhanden.'); return; }
+  try{
+    // Use outerHTML — works locally AND on Netlify (no fetch needed)
+    let src = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    // Replace placeholder values in SYNC_CONFIG (script tag preserves original literals)
+    src = src.replace(/binId:\s*'[^']*'/, `binId:  '${binId}'`);
+    src = src.replace(/apiKey:\s*'[^']*'(\s*\/\/ z\.B\.)/, `apiKey: '${apiKey}'$1`);
+    if(!src.includes(binId)){
+      // Fallback: try a broader replacement
+      src = src.replace(/(const SYNC_CONFIG\s*=\s*\{[\s\S]*?binId:\s*)'[^']*'/, `$1'${binId}'`);
+      src = src.replace(/(const SYNC_CONFIG\s*=\s*\{[\s\S]*?apiKey:\s*)'[^']*'/, `$1'${apiKey}'`);
+    }
+    const blob = new Blob([src], {type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bobanschubcup-live.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  } catch(e){
+    alert('Fehler beim Herunterladen: ' + e.message);
+  }
+}
+
+
+function pt(s){if(!s)return null;const n=parseFloat(String(s).replace(',','.'));return isNaN(n)||n<=0?null:n;}
+function ft(n){return n===null?'—':n.toFixed(3).replace('.',',')+'s';}
+function avg(t){const a=pt(t.run1),b=pt(t.run2);return a!==null&&b!==null?(a+b)/2:null;}
+// sortKey: final avg if both done, best single time if only one run, null if none
+function sortKey(t){const a=avg(t);if(a!==null)return a;const r1=pt(t.run1),r2=pt(t.run2);return r1!==null?r1:r2!==null?r2:null;}
+function ranked(){return[...teams].sort((a,b)=>{const aa=sortKey(a),bb=sortKey(b);if(aa===null&&bb===null)return 0;if(aa===null)return 1;if(bb===null)return-1;return aa-bb;});}
+
+function emblInner(t,size,radius){
+  if(t.photo)return`<img src="${t.photo}" style="width:${size}px;height:${size}px;border-radius:${radius}px;object-fit:cover">`;
+  return`<span style="font-size:${Math.round(size*0.52)}px">${t.emoji}</span>`;
+}
+
+function gotoPage(p,el){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById(p+'Page').classList.add('active');
+  el.classList.add('active');
+  if(p==='results')renderResults();
+}
+
+// ── ADMIN ──
+function renderAdmin(){
+  const list=document.getElementById('teamList');
+  if(!teams.length){list.innerHTML=`<div class="empty"><div class="empty-icon">🛷</div>Noch keine Mannschaften.<br>Füge die erste hinzu.</div>`;return;}
+  list.innerHTML=teams.map(t=>{
+    const a=avg(t);
+    return`<div class="team-row" id="tr-${t.id}">
+      <div class="avatar" onclick="triggerAv(${t.id})" title="Bild ändern">
+        ${emblInner(t,50,9)}
+        <div class="avatar-hint">Ändern</div>
+        <input type="file" accept="image/*" class="hidden-file" id="avf-${t.id}">
+      </div>
+      <div>
+        <input class="team-name-inp" id="nm-${t.id}" value="${t.name}"
+          onchange="renameTeam(${t.id},this.value)" maxlength="22"
+          title="Name bearbeiten">
+        <div class="team-badge" style="color:${t.color}">${t.photo?'📷 Foto':t.emoji+' Emoji'}</div>
+      </div>
+      <div class="time-block">
+        <div class="time-label">Lauf 1</div>
+        <input class="time-inp" type="number" step="0.001" min="0" placeholder="0.000"
+          value="${t.run1}" oninput="upd(${t.id},'run1',this.value)"
+          style="${t.run1?'border-color:'+t.color+'90':''}">
+      </div>
+      <div class="time-block">
+        <div class="time-label">Lauf 2</div>
+        <input class="time-inp" type="number" step="0.001" min="0" placeholder="0.000"
+          value="${t.run2}" oninput="upd(${t.id},'run2',this.value)"
+          style="${t.run2?'border-color:'+t.color+'90':''}">
+      </div>
+      <div class="avg-cell">
+        <div class="avg-num ${a!==null?'':'empty'}" id="avg-${t.id}">${a!==null?ft(a):'—'}</div>
+        <div class="avg-lbl">Ø Mittelwert</div>
+        <button class="del-btn" onclick="delTeam(${t.id})" title="Löschen">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M1 3h12M5 3V2h4v1M2 3l1 9h6l1-9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+  // Attach file listeners after DOM update
+  setTimeout(attachAvatarListeners, 0);
+}
+
+function triggerAv(id){
+  const el = document.getElementById('avf-'+id);
+  if(el) el.click();
+}
+
+function attachAvatarListeners(){
+  teams.forEach(t=>{
+    const inp = document.getElementById('avf-'+t.id);
+    if(inp && !inp._bound){
+      inp._bound = true;
+      inp.addEventListener('change', function(e){
+        const f = e.target.files && e.target.files[0];
+        if(!f) return;
+        resizeAndLoad(f, 200, function(dataUrl){
+          const team = teams.find(x=>x.id===t.id);
+          if(!team) return;
+          team.photo = dataUrl;
+          try{ save(); }catch(err){ console.warn('Save error:', err); }
+          renderAdmin();
+        }, function(err){ console.warn('Avatar load error:', err); });
+      });
+    }
+  });
+}
+
+function changeAv(id,e){
+  // legacy fallback — handled by attachAvatarListeners now
+}
+
+// ── Resize image via canvas to max px, return base64 ──
+function resizeAndLoad(file, maxPx, onSuccess, onError){
+  try {
+    const reader = new FileReader();
+    reader.onerror = function(){ if(onError) onError('FileReader error'); };
+    reader.onload = function(ev){
+      try {
+        const src = ev.target.result;
+        const img = new Image();
+        img.onerror = function(){ if(onError) onError('Image load error'); };
+        img.onload = function(){
+          try {
+            let w = img.width, h = img.height;
+            if(w > maxPx || h > maxPx){
+              if(w > h){ h = Math.round(h * maxPx / w); w = maxPx; }
+              else      { w = Math.round(w * maxPx / h); h = maxPx; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+            onSuccess(dataUrl);
+          } catch(err){ if(onError) onError(err); }
+        };
+        img.src = src;
+      } catch(err){ if(onError) onError(err); }
+    };
+    reader.readAsDataURL(file);
+  } catch(err){ if(onError) onError(err); }
+}
+function renameTeam(id,val){
+  const t=teams.find(x=>x.id===id);if(!t||!val.trim())return;
+  t.name=val.trim();save();
+}
+function upd(id,run,val){
+  const t=teams.find(x=>x.id===id);if(!t)return;t[run]=val;save();
+  const a=avg(t);const el=document.getElementById('avg-'+id);
+  if(el){el.textContent=a!==null?ft(a):'—';el.className='avg-num'+(a!==null?'':' empty');}
+}
+function delTeam(id){if(!confirm('Mannschaft wirklich löschen?'))return;teams=teams.filter(x=>x.id!==id);save();renderAdmin();}
+
+// ── MODAL ──
+function openModal(){
+  selEmoji=EMOJIS[0];photoDataUrl=null;emblMode='emoji';
+  document.getElementById('mName').value='';
+  // Reset file input safely
+  const pi = document.getElementById('photoInput');
+  if(pi){ try{ pi.value=''; }catch(e){} }
+  const img = document.getElementById('photoPreviewImg');
+  const ph  = document.getElementById('photoPlaceholder');
+  const err = document.getElementById('photoError');
+  if(img){ img.src=''; img.style.display='none'; }
+  if(ph)  ph.style.display='block';
+  if(err) err.style.display='none';
+  setMode('emoji');
+  document.getElementById('emojiGrid').innerHTML=EMOJIS.map((e,i)=>`<div class="em-opt ${i===0?'sel':''}" onclick="pickEmoji(this,'${e}')">${e}</div>`).join('');
+  document.getElementById('modal').classList.add('open');
+  attachPhotoListener();
+  setTimeout(()=>document.getElementById('mName').focus(),100);
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function setMode(m){
+  emblMode=m;
+  document.getElementById('emojiSection').style.display=m==='emoji'?'block':'none';
+  document.getElementById('photoSection').style.display=m==='photo'?'block':'none';
+  document.getElementById('modeEmoji').classList.toggle('active',m==='emoji');
+  document.getElementById('modePhoto').classList.toggle('active',m==='photo');
+}
+function pickEmoji(el,e){document.querySelectorAll('.em-opt').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');selEmoji=e;}
+function handlePhoto(e){
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const errEl = document.getElementById('photoError');
+  if(errEl) errEl.style.display='none';
+  resizeAndLoad(f, 200, function(dataUrl){
+    photoDataUrl = dataUrl;
+    const img = document.getElementById('photoPreviewImg');
+    const ph  = document.getElementById('photoPlaceholder');
+    if(img){ img.src = dataUrl; img.style.display='block'; }
+    if(ph)  ph.style.display='none';
+  }, function(err){
+    console.warn('Photo error:', err);
+    if(errEl){ errEl.textContent='Fehler beim Laden des Bildes. Bitte ein anderes Foto wählen.'; errEl.style.display='block'; }
+  });
+}
+
+function attachPhotoListener(){
+  const inp = document.getElementById('photoInput');
+  if(inp && !inp._bound){
+    inp._bound = true;
+    inp.addEventListener('change', handlePhoto);
+  }
+}
+function nextFreeColor(){
+  const used=new Set(teams.map(t=>t.color));
+  return COLORS.find(c=>!used.has(c))||COLORS[teams.length%COLORS.length];
+}
+function addTeam(){
+  const name=document.getElementById('mName').value.trim();
+  if(!name){document.getElementById('mName').focus();return;}
+  const color=nextFreeColor();
+  teams.push({id:nextId++,name,emoji:selEmoji,color,photo:emblMode==='photo'?photoDataUrl:null,run1:'',run2:''});
+  save();closeModal();renderAdmin();
+}
+
+// ── RUN CHIP: determine current run phase ──
+function currentRunPhase(){
+  if(!teams.length) return null;
+  const anyRun1 = teams.some(t=>pt(t.run1)!==null);
+  const anyRun2 = teams.some(t=>pt(t.run2)!==null);
+  const allRun1 = teams.every(t=>pt(t.run1)!==null);
+  const allRun2 = teams.every(t=>pt(t.run2)!==null);
+  if(allRun2) return {label:'Lauf 2/2', done:true};
+  if(anyRun2 || allRun1) return {label:'Lauf 2/2', done:false};
+  if(anyRun1) return {label:'Lauf 1/2', done:false};
+  return {label:'Lauf 1/2', done:false};
+}
+function updateRunChip(){
+  const chip = document.getElementById('runChip');
+  if(!chip) return;
+  const phase = currentRunPhase();
+  if(!phase){ chip.textContent=''; return; }
+  chip.textContent = (phase.done ? '✓ ' : '🏃 ') + phase.label;
+  chip.style.background = phase.done ? 'rgba(16,185,129,0.12)' : 'rgba(59,130,246,0.12)';
+  chip.style.borderColor = phase.done ? 'rgba(16,185,129,0.4)' : 'rgba(59,130,246,0.35)';
+  chip.style.color = phase.done ? '#6ee7b7' : '#93c5fd';
+}
+
+// ── RESULTS ──
+function renderResults(){
+  updateRunChip();
+  const r=ranked();
+  const lanes=document.getElementById('trackLanes');
+  const rl=document.getElementById('rankList');
+  if(!r.length){lanes.innerHTML=`<div class="empty" style="color:rgba(255,255,255,0.35);padding:70px 20px">Noch keine Mannschaften</div>`;rl.innerHTML='';return;}
+  const vw=Math.max(document.documentElement.clientWidth||0,window.innerWidth||0);
+  const bobW=170, rightPad=100, startX=14;
+  const finishX=vw-rightPad-bobW-10;
+  const spread=finishX-startX;
+  const withKey=r.filter(t=>sortKey(t)!==null);
+  lanes.innerHTML=r.map((t,i)=>{
+    const a=avg(t);
+    const sk=sortKey(t);
+    const hasBoth=pt(t.run1)!==null&&pt(t.run2)!==null;
+    let lx=sk!==null&&withKey.length>0?finishX-(i/Math.max(r.length-1,1))*spread:startX;
+    const rank=i+1;
+    const pc=rank===1?'rp1':rank===2?'rp2':rank===3?'rp3':'rpn';
+    // Zeit nur anzeigen wenn beide Läufe fertig → gemittelter Endwert
+    const timeStr=hasBoth?ft(a):'';
+    return`<div class="lane">
+      <div class="lane-line"></div>
+      <div class="bob-wrap" id="bw-${t.id}" style="left:${lx}px">
+        <div class="rank-left"><div class="rank-pill ${pc}">${rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank}</div></div>
+        <div class="bob-svg-outer" style="position:relative">
+          ${bobSVG(t)}
+          <div class="bob-below">
+            <div class="bob-name">${t.name}</div>
+            ${timeStr?`<span class="bob-time">${timeStr}</span>`:''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  rl.innerHTML=r.map((t,i)=>{
+    const a=avg(t);const rank=i+1;
+    const hasBoth=pt(t.run1)!==null&&pt(t.run2)!==null;
+    const m=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+    return`<div class="panel-row">
+      <div class="panel-rank" style="color:${rank===1?'#f59e0b':rank===2?'#94a3b8':rank===3?'#b45309':'#6b7280'}">${m||rank}</div>
+      <div class="panel-av">${emblInner(t,28,5)}</div>
+      <div class="panel-info"><div class="panel-name">${t.name}</div><div class="panel-t">${hasBoth?ft(a):'—'}</div></div>
+    </div>`;
+  }).join('');
+  requestAnimationFrame(()=>{
+    r.forEach((t,i)=>{
+      const sk=sortKey(t);
+      let lx=sk!==null&&withKey.length>0?finishX-(i/Math.max(r.length-1,1))*spread:startX;
+      const el=document.getElementById('bw-'+t.id);
+      if(el)el.style.left=lx+'px';
+    });
+  });
+}
+
+// ── BOB SVG ──
+function bobSVG(t){
+  const c=t.color,uid=t.id;
+  let embl;
+  if(t.photo){
+    embl=`<image href="${t.photo}" x="46" y="13" width="28" height="24" clip-path="url(#cp${uid})" preserveAspectRatio="xMidYMid slice"/>`;
+  } else {
+    embl=`<text x="60" y="28" font-size="14" text-anchor="middle" dominant-baseline="middle">${t.emoji}</text>`;
+  }
+  return`<svg viewBox="0 0 128 56" xmlns="http://www.w3.org/2000/svg" style="width:128px;height:56px;filter:drop-shadow(1px 4px 10px rgba(0,0,0,0.38))">
+    <defs>
+      <linearGradient id="g${uid}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${c}"/>
+        <stop offset="100%" stop-color="${c}" stop-opacity="0.55"/>
+      </linearGradient>
+      <clipPath id="cp${uid}"><ellipse cx="60" cy="25" rx="15" ry="12"/></clipPath>
+    </defs>
+    <rect x="7" y="45" width="112" height="6" rx="3" fill="#9ca3af" opacity="0.65"/>
+    <rect x="11" y="47" width="104" height="2" rx="1" fill="#e5e7eb" opacity="0.8"/>
+    <path d="M5 43 Q5 17 20 15 L98 15 Q120 15 120 30 L120 43 Z" fill="url(#g${uid})"/>
+    <path d="M5 43 L5 25 Q5 15 20 15 L26 15 L9 43 Z" fill="${c}"/>
+    <path d="M26 15 L98 15 L98 19 L26 19 Z" fill="rgba(255,255,255,0.1)"/>
+    <ellipse cx="60" cy="21" rx="21" ry="7.5" fill="rgba(186,230,253,0.18)" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
+    ${embl}
+    <path d="M30 16 Q60 12 96 16" stroke="rgba(255,255,255,0.3)" stroke-width="1.4" fill="none"/>
+    <rect x="112" y="19" width="5" height="19" rx="2.5" fill="${c}" opacity="0.7"/>
+    <rect x="119" y="22" width="4" height="13" rx="2" fill="${c}" opacity="0.45"/>
+  </svg>`;
+}
+
+load();
+
+// ── URL MODE: ?view=results → nur Ergebnisseite (QR-Code-Link) ──
+const urlParams = new URLSearchParams(window.location.search);
+const isResultsView = urlParams.get('view')==='results';
+
+if(isResultsView){
+  document.querySelector('.tabs').style.display='none';
+  document.getElementById('adminPage').classList.remove('active');
+  document.getElementById('resultsPage').classList.add('active');
+  renderResults();
+} else {
+  renderAdmin();
+  renderQR();
+}
+
+// ── Auto-connect Firebase if config exists ──
+// ── Auto-connect if config exists ──
+(async function(){
+  if(syncReady()){
+    setStatus('connected');
+    syncStart();
+  } else {
+    setStatus(isResultsView ? 'offline' : 'setup');
+  }
+})();
+
+// Polling fallback for results view when no sync
+setInterval(()=>{
+  if(document.getElementById('resultsPage').classList.contains('active') && !syncReady()) renderResults();
+},3000);
+window.addEventListener('resize',()=>{
+  if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
+});
+
+function renderQR(){
+  const el = document.getElementById('qrBlock');
+  if(!el) return;
+  if(!syncReady()){
+    el.innerHTML=`
+      <div class="qr-card" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.05)">
+        <div style="font-size:2rem">⚠️</div>
+        <div class="qr-label" style="color:#fca5a5">Live-Sync nicht eingerichtet</div>
+        <p style="color:var(--muted);font-size:0.8rem;text-align:center;line-height:1.6">Ohne Sync sehen Teilnehmende<br>keine Ergebnisse auf ihrem Gerät.</p>
+        <button class="qr-open-btn" onclick="openSetup()" style="background:var(--surface2);border:1px solid var(--border-active);color:var(--text)">⚙ Live-Sync einrichten</button>
+      </div>`;
+    return;
+  }
+  const cfg = syncConfig();
+  const encoded = b64enc(cfg.binId + '|' + cfg.apiKey);
+  const baseUrl  = window.location.origin + window.location.pathname;
+  const resultsUrl = baseUrl + '?view=results#s=' + encoded;
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(resultsUrl)}&bgcolor=111318&color=f0f2f5&format=svg&ecc=M`;
+  el.innerHTML = `
+    <div class="qr-card">
+      <div class="qr-label">QR-Code für Teilnehmende</div>
+      <img src="${qrApiUrl}" class="qr-img" alt="QR-Code Ergebnisse" onerror="this.parentElement.innerHTML='<div class=qr-error>QR-Code wird online generiert – bitte Internetverbindung prüfen</div>'" style="width:220px;height:220px">
+      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-top:4px">Zugangsdaten eingebettet · kein Setup nötig</div>
+      <a href="${resultsUrl}" target="_blank" class="qr-open-btn">↗ Ergebnisseite öffnen</a>
+    </div>`;
+}
+</script>
+</body>
+</html>
