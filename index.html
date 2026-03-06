@@ -314,13 +314,13 @@ body.results-mode .sync-status.status-off {
 
 /* Ranking panel */
 .rank-panel {
-  background: rgba(255,255,255,0.96); border-top: 3px solid #2563eb;
+  background: rgba(255,255,255,0.97); border-top: 3px solid #2563eb;
   padding: 10px 16px 14px; z-index: 50; overflow-x: auto;
   scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
 }
-.panel-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.72rem;
-  color: #fff; letter-spacing: 1.5px; text-transform: uppercase;
+.panel-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.78rem;
+  color: #0f172a; letter-spacing: 2px; text-transform: uppercase;
   margin-bottom: 8px; }
 #rankList { display: flex; flex-direction: row; gap: 8px; min-width: max-content; }
 .panel-row {
@@ -1375,168 +1375,169 @@ async function downloadUrkunden(){
   doc.save('Bobanschubcup-2026-Urkunden.pdf');
 }
 
-// Zeichnet eine einzelne Urkunden-Seite (A4 Hochformat) in das jsPDF-Dokument
+// Zeichnet Urkunde – Dark Navy/Gold Design (wie Screenshot)
 function drawUrkunde(doc, team, W, H, logoB64, bobBgB64, dateStr){
   // W=210, H=297
 
+  const NAVY  = [8, 18, 52];
+  const GOLD  = [212, 175, 55];
+  const WHITE = [255, 255, 255];
+
   function logo3D(x,y,w,h){
     doc.setGState(new doc.GState({opacity:0.12}));
-    try{doc.addImage(logoB64,'PNG',x+4,y+4,w,h);}catch(e){}
-    doc.setGState(new doc.GState({opacity:0.25}));
-    try{doc.addImage(logoB64,'PNG',x+2.5,y+2.5,w,h);}catch(e){}
-    doc.setGState(new doc.GState({opacity:0.45}));
-    try{doc.addImage(logoB64,'PNG',x+1.2,y+1.2,w,h);}catch(e){}
+    try{doc.addImage(logoB64,'PNG',x+3,y+3,w,h);}catch(e){}
+    doc.setGState(new doc.GState({opacity:0.3}));
+    try{doc.addImage(logoB64,'PNG',x+1.5,y+1.5,w,h);}catch(e){}
     doc.setGState(new doc.GState({opacity:1}));
     try{doc.addImage(logoB64,'PNG',x,y,w,h);}catch(e){}
   }
 
-  // Bob-Hintergrundbild (portrait crop – obere Hälfte)
-  try{doc.addImage(bobBgB64,'JPEG',0,0,W,H);}catch(e){}
-
-  // Weisses Overlay
-  doc.setFillColor(255,255,255);
-  doc.setGState(new doc.GState({opacity:0.82}));
+  // ── Dunkelblauer Hintergrund ──
+  doc.setFillColor(...NAVY);
   doc.rect(0,0,W,H,'F');
-  doc.setGState(new doc.GState({opacity:1}));
 
-  // Doppelter Rahmen
-  doc.setDrawColor(15,45,105);
-  doc.setLineWidth(2.2);
-  doc.rect(6,6,W-12,H-12);
-  doc.setDrawColor(90,135,195);
-  doc.setLineWidth(0.6);
-  doc.rect(9,9,W-18,H-18);
+  // ── Goldene Dreiecke oben links + rechts ──
+  doc.setFillColor(...GOLD);
+  doc.triangle(0,0, 72,0, 0,72, 'F');
+  doc.triangle(W,0, W-72,0, W,72, 'F');
 
-  // ── Logos oben links + rechts ──
-  const lw=50, lh=18;
-  logo3D(12, 12, lw, lh);
-  logo3D(W-12-lw, 12, lw, lh);
+  // ── Bob-Hintergrundbild im mittleren Band ──
+  try{
+    doc.setGState(new doc.GState({opacity:0.22}));
+    doc.addImage(bobBgB64,'JPEG', 0, 118, W, 82);
+    doc.setGState(new doc.GState({opacity:1}));
+  }catch(e){}
 
-  // ── Logos unten links + rechts ──
-  logo3D(12, H-12-lh, lw, lh);
-  logo3D(W-12-lw, H-12-lh, lw, lh);
+  // ── 4 Rotary Logos ──
+  const lw=52, lh=19;
+  logo3D(10, 8, lw, lh);
+  logo3D(W-10-lw, 8, lw, lh);
+  logo3D(10, H-10-lh, lw, lh);
+  logo3D(W-10-lw, H-10-lh, lw, lh);
 
   // ── URKUNDE ──
+  doc.setFont(PFONT(),'bold');
+  doc.setFontSize(58);
+  doc.setTextColor(...GOLD);
   const cs=6, uTxt='URKUNDE';
-  doc.setFont(PFONT(),'bold');
-  doc.setFontSize(52);
-  doc.setTextColor(12,28,72);
-  const uW=doc.getTextWidth(uTxt)+cs*(uTxt.length-1);
-  doc.text(uTxt,(W-uW)/2,60,{charSpace:cs});
+  const uW = doc.getTextWidth(uTxt)+cs*(uTxt.length-1);
+  doc.text(uTxt,(W-uW)/2, 60, {charSpace:cs});
 
-  // Zierstreifen
-  doc.setFillColor(15,55,130);
-  doc.rect((W-uW)/2,62,uW,1.4,'F');
-  doc.setFillColor(90,140,210);
-  doc.rect((W-uW)/2,63.8,uW,0.5,'F');
+  // Goldene Doppellinie
+  doc.setFillColor(...GOLD);
+  doc.rect((W-uW)/2, 63, uW, 1.4, 'F');
+  doc.setGState(new doc.GState({opacity:0.4}));
+  doc.rect((W-uW)/2, 65.2, uW, 0.5, 'F');
+  doc.setGState(new doc.GState({opacity:1}));
 
-  // ── Bobanschubcup 2026 ──
+  // ── BOBANSCHUBCUP 2026 ──
   doc.setFont(PFONT(),'bold');
-  doc.setFontSize(18);
-  doc.setTextColor(15,38,90);
-  const titleCs=1.5, titleTxt='Bobanschubcup 2026';
+  doc.setFontSize(17);
+  doc.setTextColor(...WHITE);
+  const titleCs=3, titleTxt='BOBANSCHUBCUP 2026';
   const titleW=doc.getTextWidth(titleTxt)+titleCs*(titleTxt.length-1);
-  doc.text(titleTxt,(W-titleW)/2,76,{charSpace:titleCs});
+  doc.text(titleTxt,(W-titleW)/2, 76, {charSpace:titleCs});
 
   // RC Riesa-Elbland
   doc.setFont(PFONT(),'normal');
-  doc.setFontSize(12);
-  doc.setTextColor(60,88,135);
-  doc.text('RC Riesa-Elbland',W/2,86,{align:'center'});
+  doc.setFontSize(13);
+  doc.setTextColor(180,200,230);
+  doc.text('RC Riesa-Elbland', W/2, 87, {align:'center'});
 
-  // Trennlinie
-  doc.setDrawColor(15,55,130);
-  doc.setLineWidth(0.9);
-  doc.line(W/2-70,91,W/2+70,91);
-  doc.setDrawColor(130,170,220);
-  doc.setLineWidth(0.3);
-  doc.line(W/2-70,92.5,W/2+70,92.5);
+  // Goldene Trennlinie
+  doc.setFillColor(...GOLD);
+  doc.setGState(new doc.GState({opacity:0.5}));
+  doc.rect(W/2-65, 92, 130, 0.7, 'F');
+  doc.setGState(new doc.GState({opacity:1}));
 
   // TEILNAHME-ZERTIFIKAT
   doc.setFont(PFONT(),'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(20,42,92);
-  const tzTxt='TEILNAHME-ZERTIFIKAT', tzCs=2.5;
+  doc.setFontSize(10);
+  doc.setTextColor(180,200,230);
+  const tzTxt='TEILNAHME-ZERTIFIKAT', tzCs=2.8;
   const tzW=doc.getTextWidth(tzTxt)+tzCs*(tzTxt.length-1);
-  doc.text(tzTxt,(W-tzW)/2,102,{charSpace:tzCs});
+  doc.text(tzTxt,(W-tzW)/2, 102, {charSpace:tzCs});
 
-  // Fuer die erfolgreiche Teilnahme
+  // Für die erfolgreiche Teilnahme
   doc.setFont(PFONT(),'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(65,92,140);
-  doc.text('Für die erfolgreiche Teilnahme der Mannschaft:',W/2,112,{align:'center'});
+  doc.setFontSize(12);
+  doc.setTextColor(180,200,230);
+  doc.text('Für die erfolgreiche Teilnahme der Mannschaft:', W/2, 113, {align:'center'});
 
-  // ── Teamname gross kursiv ──
+  // ── Teamname – weiss, gross, kursiv ──
   doc.setFont(PFONT(),'bolditalic');
-  doc.setFontSize(34);
-  doc.setTextColor(10,25,65);
-  doc.text(team.name,W/2,128,{align:'center'});
+  doc.setFontSize(36);
+  doc.setTextColor(...WHITE);
+  doc.text(team.name, W/2, 139, {align:'center'});
 
-  // Linie unter Teamname
-  const nw=Math.min(doc.getTextWidth(team.name)+12,W-30);
-  doc.setDrawColor(15,45,105);
+  // Goldene Linie unter Name
+  const nw=Math.min(doc.getTextWidth(team.name)+10,W-28);
+  doc.setDrawColor(...GOLD);
   doc.setLineWidth(0.9);
-  doc.line(W/2-nw/2,132,W/2+nw/2,132);
+  doc.line(W/2-nw/2,143,W/2+nw/2,143);
 
   // Datum
   doc.setFont(PFONT(),'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(65,92,140);
-  doc.text(dateStr+' · Riesa',W/2,142,{align:'center'});
+  doc.setFontSize(12);
+  doc.setTextColor(180,200,230);
+  doc.text(dateStr+' · Riesa', W/2, 154, {align:'center'});
 
-  // Platzierung
+  // Platzierung in Gold
   const platzText=['','1. Platz','2. Platz','3. Platz'][team.platz]||(team.platz+'. Platz');
   doc.setFont(PFONT(),'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(15,42,95);
-  const platzLabel='PLATZIERUNG:  '+platzText.toUpperCase(), platzCs=1.2;
-  const platzW=doc.getTextWidth(platzLabel)+platzCs*(platzLabel.length-1);
-  doc.text(platzLabel,(W-platzW)/2,153,{charSpace:platzCs});
+  doc.setFontSize(18);
+  doc.setTextColor(...GOLD);
+  doc.text(platzText.toUpperCase(), W/2, 167, {align:'center'});
+
+  // Goldene Trennlinie
+  doc.setFillColor(...GOLD);
+  doc.setGState(new doc.GState({opacity:0.4}));
+  doc.rect(W/2-65,171,130,0.7,'F');
+  doc.setGState(new doc.GState({opacity:1}));
 
   // ZEITEN
+  doc.setFont(PFONT(),'bold');
   doc.setFontSize(11);
+  doc.setTextColor(...GOLD);
   const zeitCs=3, zeitTxt='ZEITEN';
   const zeitW=doc.getTextWidth(zeitTxt)+zeitCs*(zeitTxt.length-1);
-  doc.text(zeitTxt,(W-zeitW)/2,165,{charSpace:zeitCs});
+  doc.text(zeitTxt,(W-zeitW)/2, 181, {charSpace:zeitCs});
 
-  // Zeitboxen
-  function timeBox(y,label,val){
-    doc.setFillColor(250,252,255);
-    doc.setDrawColor(90,145,210);
+  function timeBox(y, label, val){
+    // Dunkle Box mit Goldrand
+    doc.setFillColor(12,25,65);
+    doc.setDrawColor(...GOLD);
     doc.setLineWidth(0.8);
-    doc.roundedRect(W/2-50,y,100,15,3,3,'FD');
-    doc.setDrawColor(160,200,240);
-    doc.setLineWidth(0.4);
-    doc.line(W/2-47,y+1,W/2+47,y+1);
+    doc.roundedRect(W/2-58, y, 116, 18, 3, 3, 'FD');
+    // Goldener linker Balken
+    doc.setFillColor(...GOLD);
+    doc.rect(W/2-58, y, 4, 18, 'F');
+    // Label links
+    doc.setFont(PFONT(),'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(180,200,230);
+    doc.text(label, W/2-50, y+12);
+    // Wert zentriert
     doc.setFont(PFONT(),'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(12,38,92);
-    doc.text(label+'   '+val,W/2,y+10,{align:'center',charSpace:0.5});
+    doc.setFontSize(16);
+    doc.setTextColor(...WHITE);
+    doc.text(val, W/2, y+13, {align:'center'});
   }
-  timeBox(169,'Lauf 1:',team.lauf1);
-  timeBox(188,'Lauf 2:',team.lauf2);
+
+  timeBox(184, 'Lauf 1:', team.lauf1);
+  timeBox(207, 'Lauf 2:', team.lauf2);
 
   // Endergebnis
   doc.setFont(PFONT(),'normal');
-  doc.setFontSize(11);
-  doc.setTextColor(65,92,140);
-  doc.text('Endergebnis (Mittelwert)',W/2,212,{align:'center'});
+  doc.setFontSize(12);
+  doc.setTextColor(180,200,230);
+  doc.text('Endergebnis (Mittelwert)', W/2, 238, {align:'center'});
 
+  // Mittelwert gross in Gold
   doc.setFont(PFONT(),'bold');
-  doc.setFontSize(30);
-  doc.setTextColor(10,25,65);
-  doc.text(team.mittel,W/2,227,{align:'center'});
-
-  // Unterschriftslinie
-  doc.setDrawColor(110,150,200);
-  doc.setLineWidth(0.5);
-  doc.line(W/2-45,254,W/2+45,254);
-  doc.setFont(PFONT(),'normal');
-  doc.setFontSize(8.5);
-  doc.setTextColor(95,120,162);
-  const sigCs=1.0, sigTxt='UNTERSCHRIFT · RC RIESA-ELBLAND';
-  const sigW=doc.getTextWidth(sigTxt)+sigCs*(sigTxt.length-1);
-  doc.text(sigTxt,(W-sigW)/2,260,{charSpace:sigCs});
+  doc.setFontSize(38);
+  doc.setTextColor(...GOLD);
+  doc.text(team.mittel, W/2, 258, {align:'center'});
 }
 </script>
 </body>
