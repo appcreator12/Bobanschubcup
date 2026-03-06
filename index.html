@@ -324,9 +324,9 @@ body.results-mode .sync-status.status-off {
 /* caption below bob */
 .bob-below {
   position: absolute;
-  bottom: -18px; left: 50%; transform: translateX(-50%);
-  width: max-content;
+  bottom: -18px; left: 0; right: 0;
   display: flex; flex-direction: column; align-items: center; gap: 2px;
+  pointer-events: none;
 }
 .bob-name { font-family: 'Poppins', sans-serif; font-size: 0.58rem; font-weight: 700; color: #fff; background: rgba(0,0,0,0.72); padding: 2px 7px; border-radius: 4px; white-space: nowrap; letter-spacing: 0.1px; display: inline-block; }
 .bob-time { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; font-weight: 700; color: #fff; background: rgba(0,0,0,0.72); padding: 2px 6px; border-radius: 4px; white-space: nowrap; display: inline-block; }
@@ -1489,46 +1489,39 @@ async function downloadStartaufstellung(){
   doc.rect(0, 55, W, 10, 'F');
   doc.setFont('helvetica','bold');
   doc.setFontSize(11); doc.setTextColor(255,255,255);
-  doc.text('🚦  STARTREIHENFOLGE', W/2, 61.5, { align: 'center' });
+  doc.text('STARTREIHENFOLGE', W/2, 61.5, { align: 'center' });
 
   // ── Table ──
   const rows = teams.map((t, i) => [
     String(i + 1) + '.',
     t.name,
-    t.run1 ? ft(pt(t.run1)) : '–',
-    t.run2 ? ft(pt(t.run2)) : '–',
-    avg(t) !== null ? ft(avg(t)) : '–'
   ]);
 
   doc.autoTable({
     startY: 68,
-    head: [['Start', 'Mannschaft', 'Lauf 1', 'Lauf 2', 'Ø Mittelwert']],
+    head: [['Start', 'Mannschaft']],
     body: rows,
     theme: 'grid',
     headStyles: {
       fillColor: [10, 20, 50],
       textColor: [180, 200, 230],
       fontStyle: 'bold',
-      fontSize: 9,
+      fontSize: 10,
       cellPadding: 4,
       lineColor: [16, 185, 129],
       lineWidth: 0.3,
     },
     bodyStyles: {
-      fontSize: 10,
-      cellPadding: 4.5,
+      fontSize: 11,
+      cellPadding: 5,
       fontStyle: 'normal',
       textColor: [30, 41, 59],
     },
     alternateRowStyles: { fillColor: [240, 253, 250] },
     columnStyles: {
-      0: { cellWidth: 16, halign: 'center', fontStyle: 'bold' },
+      0: { cellWidth: 20, halign: 'center', fontStyle: 'bold' },
       1: { cellWidth: 'auto' },
-      2: { cellWidth: 28, halign: 'center', font: 'courier' },
-      3: { cellWidth: 28, halign: 'center', font: 'courier' },
-      4: { cellWidth: 32, halign: 'center', fontStyle: 'bold', font: 'courier' },
     },
-
     margin: { left: 14, right: 14 },
   });
 
