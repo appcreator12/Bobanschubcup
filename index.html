@@ -759,9 +759,28 @@ function syncCanWrite(){ return syncReady(); }
 
 // Photos are large (base64) — keep them only in localStorage, never send to JSONBin.
 // This keeps the JSONBin payload tiny so the free 100KB limit is never hit.
-function teamsWithoutPhotos(){
-  return teams.map(t=>({ id:t.id, name:t.name, emoji:t.emoji, color:t.color, run1:t.run1, run2:t.run2 }));
+// Compress a base64 dataUrl to a tiny thumbnail for JSONBin sync (~1–2 KB each)
+function makeSyncThumb(dataUrl, cb){
+  const img = new Image();
+  img.onload = function(){
+    const SIZE = 48;
+    let w = img.width, h = img.height;
+    if(w > h){ h = Math.round(h*SIZE/w); w=SIZE; } else { w=Math.round(w*SIZE/h); h=SIZE; }
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg', 0.35));
+  };
+  img.src = dataUrl;
 }
+
+// Build teams array for JSONBin: includes tiny thumbs so other devices see photos
+function teamsForSync(){
+  return teams.map(t=>({ id:t.id, name:t.name, emoji:t.emoji, color:t.color,
+    run1:t.run1, run2:t.run2, photoThumb: t.photoThumb||null }));
+}
+// Legacy – kept for makeBinPublic compatibility
+function teamsWithoutPhotos(){ return teamsForSync(); }
+
 function savePhotosLocally(){
   const photoMap = {};
   teams.forEach(t=>{ if(t.photo) photoMap[t.id] = t.photo; });
@@ -770,7 +789,8 @@ function savePhotosLocally(){
 function loadPhotosFromLocal(){
   try{
     const pm = JSON.parse(localStorage.getItem('bpch26_photos')||'{}');
-    teams.forEach(t=>{ if(pm[t.id]) t.photo = pm[t.id]; });
+    // Prefer full-quality local photo; fall back to sync thumbnail
+    teams.forEach(t=>{ t.photo = pm[t.id] || t.photoThumb || null; });
   }catch(e){}
 }
 
@@ -781,7 +801,7 @@ async function syncPush(){
     const r = await fetch(`https://api.jsonbin.io/v3/b/${c.binId}`, {
       method: 'PUT',
       headers: { 'Content-Type':'application/json', 'X-Master-Key': c.apiKey, 'X-Bin-Meta':'false' },
-      body: JSON.stringify({ teams: teamsWithoutPhotos(), nextId })
+      body: JSON.stringify({ teams: teamsForSync(), nextId })
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
     setStatus('connected');
@@ -804,7 +824,11 @@ async function syncPull(){
     lastSyncHash = hash;
     teams  = remote.teams;
     nextId = remote.nextId || Math.max(0,...remote.teams.map(t=>t.id))+1;
-    loadPhotosFromLocal(); // re-attach photos from localStorage
+    // Persist any incoming thumbnails to localStorage so they survive reload
+    const pm = {}; try{ Object.assign(pm, JSON.parse(localStorage.getItem('bpch26_photos')||'{}')); }catch(e){}
+    teams.forEach(t=>{ if(t.photoThumb && !pm[t.id]) pm[t.id] = t.photoThumb; });
+    try{ localStorage.setItem('bpch26_photos', JSON.stringify(pm)); }catch(e){}
+    loadPhotosFromLocal(); // merge full-quality local + thumbnails from remote
     setStatus('connected');
     if(!isResultsView) renderAdmin();
     if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
@@ -833,8 +857,24 @@ function save(){
   const data = { teams, nextId };
   try{ localStorage.setItem('bpch26', JSON.stringify(data)); }catch(e){}
   savePhotosLocally();
-  lastSyncHash = JSON.stringify({ teams: teamsWithoutPhotos(), nextId });
-  if(syncReady()) syncPush();
+  // Generate thumbnails for any team that has a full photo but no thumb yet,
+  // then push. For teams without new photos the push happens immediately.
+  const pending = teams.filter(t => t.photo && !t.photoThumb);
+  if(pending.length === 0){
+    lastSyncHash = JSON.stringify({ teams: teamsForSync(), nextId });
+    if(syncReady()) syncPush();
+  } else {
+    let done = 0;
+    pending.forEach(t => {
+      makeSyncThumb(t.photo, thumb => {
+        t.photoThumb = thumb;
+        if(++done === pending.length){
+          lastSyncHash = JSON.stringify({ teams: teamsForSync(), nextId });
+          if(syncReady()) syncPush();
+        }
+      });
+    });
+  }
 }
 
 function load(){
