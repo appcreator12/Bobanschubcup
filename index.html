@@ -618,57 +618,56 @@ body.results-mode .sync-status.status-off {
 
     <!-- Step indicator -->
     <div id="wizSteps" style="display:flex;gap:0;margin-bottom:22px">
-      <div class="wiz-step active" id="ws1"><span>1</span>Account</div>
+      <div class="wiz-step active" id="ws1"><span>1</span>Projekt</div>
       <div class="wiz-sep">›</div>
-      <div class="wiz-step" id="ws2"><span>2</span>API Key</div>
+      <div class="wiz-step" id="ws2"><span>2</span>DB-URL</div>
       <div class="wiz-sep">›</div>
       <div class="wiz-step" id="ws3"><span>3</span>Fertig</div>
     </div>
 
-    <!-- STEP 1: Register only — no bin creation needed -->
+    <!-- STEP 1: Create Firebase project -->
     <div id="wizPage1">
-      <div class="modal-title" style="margin-bottom:10px">Schritt 1 — Kostenlosen Account erstellen</div>
+      <div class="modal-title" style="margin-bottom:10px">Schritt 1 — Firebase-Projekt anlegen</div>
       <p style="color:var(--muted);font-size:0.83rem;margin-bottom:16px;line-height:1.65">
-        JSONBin.io speichert die Ergebnisse kostenlos im Internet.<br>
-        <strong style="color:var(--text)">Die App erstellt die Datenbank automatisch</strong> — du musst nichts weiter tun.
+        Firebase ist Googles kostenlose Echtzeit-Datenbank.<br>
+        <strong style="color:var(--text)">Bis zu 100 Geräte gleichzeitig</strong> — kein Polling, sofortige Updates.
       </p>
-      <a href="https://jsonbin.io/login" target="_blank" class="mbtn mbtn-p"
-        style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;padding:12px;border-radius:10px;font-size:0.9rem;margin-bottom:16px">
-        🌐 jsonbin.io öffnen &amp; kostenlos registrieren
+      <a href="https://console.firebase.google.com" target="_blank" class="mbtn mbtn-p"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;padding:12px;border-radius:10px;font-size:0.9rem;margin-bottom:14px">
+        🔥 console.firebase.google.com öffnen
       </a>
-      <div style="background:var(--surface2);border-radius:10px;padding:11px 14px;font-size:0.79rem;color:var(--muted);line-height:1.85">
-        <strong style="color:var(--text)">Registrierung:</strong> E-Mail eingeben → Passwort wählen → Fertig.<br>
-        <strong style="color:var(--text)">Kein Bin erstellen nötig</strong> — das erledigt die App automatisch.
+      <div style="background:var(--surface2);border-radius:10px;padding:11px 14px;font-size:0.79rem;color:var(--muted);line-height:1.95">
+        <strong style="color:var(--text)">So geht's:</strong><br>
+        1. <strong style="color:var(--text)">„Projekt erstellen"</strong> → Name eingeben (z.B. bobanschubcup)<br>
+        2. Google Analytics: <strong style="color:var(--text)">deaktivieren</strong> → Projekt erstellen<br>
+        3. Links im Menü: <strong style="color:var(--text)">„Erstellen" → „Realtime Database"</strong><br>
+        4. <strong style="color:var(--text)">„Datenbank erstellen"</strong> → Standort egal → <strong style="color:var(--text)">„Im Testmodus starten"</strong>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-top:14px">
-        <button class="mbtn mbtn-p" style="flex:0 0 auto;padding:8px 22px" onclick="wizGoto(2)">Account erstellt → Weiter →</button>
+        <button class="mbtn mbtn-p" style="flex:0 0 auto;padding:8px 22px" onclick="wizGoto(2)">Datenbank erstellt → Weiter →</button>
       </div>
     </div>
 
-    <!-- STEP 2: Only API Key needed -->
+    <!-- STEP 2: Paste DB URL -->
     <div id="wizPage2" style="display:none">
-      <div class="modal-title" style="margin-bottom:10px">Schritt 2 — API Key kopieren</div>
+      <div class="modal-title" style="margin-bottom:10px">Schritt 2 — Datenbank-URL kopieren</div>
       <p style="color:var(--muted);font-size:0.83rem;margin-bottom:14px;line-height:1.65">
         Das ist der einzige Wert den du kopieren musst.
       </p>
       <div style="background:var(--surface2);border-radius:10px;padding:11px 14px;font-size:0.79rem;color:var(--muted);line-height:1.95;margin-bottom:14px">
-        <strong style="color:var(--text)">So findest du den Key:</strong><br>
-        1. Oben rechts auf dein <strong style="color:var(--text)">Profilbild</strong> klicken → <strong style="color:var(--text)">„API Keys"</strong><br>
-        2. <strong style="color:var(--text)">„+ ADD API KEY"</strong> → beliebigen Namen → bestätigen<br>
-        3. Den Key (<code style="color:var(--accent)">$2a$10$...</code>) kopieren und unten einfügen
+        <strong style="color:var(--text)">So findest du die URL:</strong><br>
+        In der Realtime Database Seite steht oben die URL:<br>
+        <code style="color:var(--accent)">https://mein-projekt-default-rtdb.europe-west1.firebasedatabase.app</code><br>
+        Diese URL komplett kopieren und unten einfügen.
       </div>
-      <a href="https://jsonbin.io/api-keys" target="_blank"
-        style="display:flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;padding:9px;border-radius:9px;font-size:0.82rem;margin-bottom:14px;background:var(--surface2);color:var(--text);border:1px solid var(--border-active)">
-        🔑 Direkt zu jsonbin.io → API Keys
-      </a>
       <div class="field">
-        <label class="field-label">Master Key hier einfügen</label>
-        <input class="field-input" id="fbApiKey" type="text" placeholder="$2a$10$..."
-          oninput="document.getElementById('wizConnectBtn').style.display=this.value.length>10?'flex':'none'">
+        <label class="field-label">Datenbank-URL hier einfügen</label>
+        <input class="field-input" id="fbDbUrl" type="text" placeholder="https://mein-projekt-default-rtdb.europe-west1.firebasedatabase.app"
+          oninput="document.getElementById('wizConnectBtn').style.display=(this.value.includes('firebasedatabase.app')||this.value.includes('firebaseio.com'))?'flex':'none'">
       </div>
       <div id="wizConnectBtn" style="display:none;justify-content:space-between;margin-top:8px;gap:8px">
         <button class="mbtn mbtn-s" style="flex:0 0 auto" onclick="wizGoto(1)">← Zurück</button>
-        <button class="mbtn mbtn-p" id="connectBtn" style="flex:1" onclick="saveSetup()">✓ Verbinden &amp; Datenbank erstellen</button>
+        <button class="mbtn mbtn-p" id="connectBtn" style="flex:1" onclick="saveSetup()">✓ Verbinden</button>
       </div>
     </div>
 
@@ -707,19 +706,18 @@ const COLORS=[
 ];
 
 // ══════════════════════════════════════════════════════
-//  JSONBIN.IO SYNC  — einfachste Lösung, kein SDK
-//  Einrichtung: 1 kostenlosen Account, 1 Bin-ID kopieren
-// ══════════════════════════════════════════════════════
+//  FIREBASE REALTIME DATABASE SYNC
+//  Echtzeit via Server-Sent Events — kein Polling, kein SDK
+// ══════════════════════════════════════════════════════════
 
-// ▼▼▼ HIER JSONBin-Zugangsdaten eintragen (nach Einrichtung) ▼▼▼
+// ▼▼▼ HIER Firebase-Datenbank-URL eintragen (nach Einrichtung) ▼▼▼
 const SYNC_CONFIG = {
-  binId:  '',   // z.B. "6650a1234abc1234567890ab"
-  apiKey: '',   // z.B. "$2a$10$..."
+  dbUrl: 'https://bobanschubcup-2b352-default-rtdb.firebaseio.com',
 };
 // ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲ ▲▲▲
 
 const SYNC_KEY = 'bpch26_sync';
-let syncInterval = null;
+let fbEventSource = null;
 let lastSyncHash = '';
 
 // URL-safe base64 (avoids + / = issues in URL fragments)
@@ -727,16 +725,15 @@ function b64enc(s){ return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace
 function b64dec(s){ return atob(s.replace(/-/g,'+').replace(/_/g,'/')); }
 
 function syncConfig(){
-  if(SYNC_CONFIG.binId && SYNC_CONFIG.apiKey) return SYNC_CONFIG;
-  // Read from URL hash: #s=URLSAFE_BASE64(binId|apiKey)
+  if(SYNC_CONFIG.dbUrl) return SYNC_CONFIG;
+  // Read from URL hash: #s=URLSAFE_BASE64(dbUrl)
   try{
     const h = window.location.hash;
     if(h.startsWith('#s=')){
-      const parts = b64dec(h.slice(3)).split('|');
-      if(parts.length===2 && parts[0] && parts[1]){
-        SYNC_CONFIG.binId  = parts[0];
-        SYNC_CONFIG.apiKey = parts[1];
-        localStorage.setItem(SYNC_KEY, JSON.stringify({binId:parts[0],apiKey:parts[1]}));
+      const dbUrl = b64dec(h.slice(3)).trim();
+      if(dbUrl && dbUrl.startsWith('https://')){
+        SYNC_CONFIG.dbUrl = dbUrl;
+        localStorage.setItem(SYNC_KEY, JSON.stringify({dbUrl}));
         return SYNC_CONFIG;
       }
     }
@@ -744,19 +741,15 @@ function syncConfig(){
   // Fall back to localStorage
   try{
     const d = JSON.parse(localStorage.getItem(SYNC_KEY)||'null');
-    if(d&&d.binId&&d.apiKey){
-      SYNC_CONFIG.binId=d.binId; SYNC_CONFIG.apiKey=d.apiKey; return SYNC_CONFIG;
-    }
+    if(d && d.dbUrl){ SYNC_CONFIG.dbUrl = d.dbUrl; return SYNC_CONFIG; }
   }catch(e){}
   return null;
 }
 function syncSaveConfig(cfg){
   localStorage.setItem(SYNC_KEY, JSON.stringify(cfg));
-  SYNC_CONFIG.binId  = cfg.binId;
-  SYNC_CONFIG.apiKey = cfg.apiKey;
+  SYNC_CONFIG.dbUrl = cfg.dbUrl;
 }
-// syncReady: always need both binId and apiKey
-function syncReady(){ const c=syncConfig(); return !!(c&&c.binId&&c.apiKey); }
+function syncReady(){ const c=syncConfig(); return !!(c&&c.dbUrl); }
 function syncCanWrite(){ return syncReady(); }
 
 // Photos are large (base64) — keep them only in localStorage, never send to JSONBin.
@@ -780,7 +773,7 @@ function teamsForSync(){
   return teams.map(t=>({ id:t.id, name:t.name, emoji:t.emoji, color:t.color,
     run1:t.run1, run2:t.run2, photoThumb: t.photoThumb||null }));
 }
-// Legacy – kept for makeBinPublic compatibility
+// teamsWithoutPhotos kept for compatibility
 function teamsWithoutPhotos(){ return teamsForSync(); }
 
 function savePhotosLocally(){
@@ -800,59 +793,63 @@ async function syncPush(){
   if(!syncReady()) return;
   const c = syncConfig();
   try{
-    const r = await fetch(`https://api.jsonbin.io/v3/b/${c.binId}`, {
+    // teamsForSync() already excludes full photos — only thumbs go to Firebase
+    const payload = { teams: teamsForSync(), nextId };
+    lastSyncHash = JSON.stringify(payload);
+    const r = await fetch(`${c.dbUrl}/bobanschubcup.json`, {
       method: 'PUT',
-      headers: { 'Content-Type':'application/json', 'X-Master-Key': c.apiKey, 'X-Bin-Meta':'false' },
-      body: JSON.stringify({ teams: teamsForSync(), nextId })
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(payload)
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
     setStatus('connected');
   } catch(e){ console.warn('Sync push error:', e); setStatus('error'); }
 }
 
-async function syncPull(){
-  if(!syncReady()) return;
-  const c = syncConfig();
-  try{
-    const r = await fetch(`https://api.jsonbin.io/v3/b/${c.binId}/latest`, {
-      headers: { 'X-Master-Key': c.apiKey, 'X-Bin-Meta':'false' }
-    });
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const d = await r.json();
-    const remote = d.record || d;
-    if(!remote || !remote.teams) return;
-    const hash = JSON.stringify(remote);
-    if(hash === lastSyncHash) return;
-    lastSyncHash = hash;
-    teams  = remote.teams;
-    nextId = remote.nextId || Math.max(0,...remote.teams.map(t=>t.id))+1;
-    // Persist any incoming thumbnails to localStorage so they survive reload
-    const pm = {}; try{ Object.assign(pm, JSON.parse(localStorage.getItem('bpch26_photos')||'{}')); }catch(e){}
-    teams.forEach(t=>{ if(t.photoThumb && !pm[t.id]) pm[t.id] = t.photoThumb; });
-    try{ localStorage.setItem('bpch26_photos', JSON.stringify(pm)); }catch(e){}
-    loadPhotosFromLocal(); // merge full-quality local + thumbnails from remote
-    setStatus('connected');
-    if(!isResultsView) renderAdmin();
-    if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
-  } catch(e){ console.warn('Sync pull error:', e); setStatus('error'); }
-}
-
-async function makeBinPublic(binId, apiKey){
-  // Set bin to public so reads work without key
-  try{
-    await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type':'application/json', 'X-Master-Key': apiKey,
-                 'X-Bin-Private':'false', 'X-Bin-Meta':'false' },
-      body: JSON.stringify({ teams, nextId })
-    });
-  }catch(e){ console.warn('makeBinPublic error:', e); }
+function applyRemoteData(data){
+  if(!data || !data.teams) return;
+  // Strip full photos from incoming data — only thumbs are synced
+  const safeTeams = data.teams.map(t => {
+    const {photo, ...rest} = t; // eslint-disable-line no-unused-vars
+    return rest;
+  });
+  const safe = { ...data, teams: safeTeams };
+  const hash = JSON.stringify(safe);
+  if(hash === lastSyncHash) return; // eigene Änderung, ignorieren
+  lastSyncHash = hash;
+  teams  = safe.teams;
+  nextId = safe.nextId || Math.max(0,...safe.teams.map(t=>t.id))+1;
+  // Persist incoming thumbnails to localStorage
+  const pm = {}; try{ Object.assign(pm, JSON.parse(localStorage.getItem('bpch26_photos')||'{}')); }catch(e){}
+  teams.forEach(t=>{ if(t.photoThumb && !pm[t.id]) pm[t.id] = t.photoThumb; });
+  try{ localStorage.setItem('bpch26_photos', JSON.stringify(pm)); }catch(e){}
+  loadPhotosFromLocal();
+  setStatus('connected');
+  if(!isResultsView) renderAdmin();
+  if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
 }
 
 function syncStart(){
-  if(syncInterval) clearInterval(syncInterval);
-  syncInterval = setInterval(syncPull, 3000);
-  syncPull();
+  if(fbEventSource){ fbEventSource.close(); fbEventSource=null; }
+  const c = syncConfig();
+  if(!c) return;
+  // Firebase Realtime Database supports Server-Sent Events natively via EventSource
+  // EventSource automatically sends Accept: text/event-stream — no query param needed
+  const sseUrl = `${c.dbUrl}/bobanschubcup.json`;
+  fbEventSource = new EventSource(sseUrl);
+  fbEventSource.addEventListener('put', e => {
+    try{
+      const msg = JSON.parse(e.data);
+      if(msg.data) applyRemoteData(msg.data);
+    }catch(err){ console.warn('SSE parse error', err); }
+  });
+  fbEventSource.addEventListener('patch', e => {
+    try{
+      const msg = JSON.parse(e.data);
+      if(msg.data) applyRemoteData(msg.data);
+    }catch(err){}
+  });
+  fbEventSource.onerror = () => setStatus('error');
 }
 
 function save(){
@@ -863,7 +860,6 @@ function save(){
   // then push. For teams without new photos the push happens immediately.
   const pending = teams.filter(t => t.photo && !t.photoThumb);
   if(pending.length === 0){
-    lastSyncHash = JSON.stringify({ teams: teamsForSync(), nextId });
     if(syncReady()) syncPush();
   } else {
     let done = 0;
@@ -871,7 +867,6 @@ function save(){
       makeSyncThumb(t.photo, thumb => {
         t.photoThumb = thumb;
         if(++done === pending.length){
-          lastSyncHash = JSON.stringify({ teams: teamsForSync(), nextId });
           if(syncReady()) syncPush();
         }
       });
@@ -921,47 +916,42 @@ function wizGoto(step){
 
 function openSetup(){
   const cfg = syncConfig()||{};
-  document.getElementById('fbApiKey').value = cfg.apiKey||'';
-  const hasKey = (cfg.apiKey||'').length > 10;
-  document.getElementById('wizConnectBtn').style.display = hasKey ? 'flex' : 'none';
+  document.getElementById('fbDbUrl').value = cfg.dbUrl||'';
+  const hasUrl = (cfg.dbUrl||'').includes('firebasedatabase.app') || (cfg.dbUrl||'').includes('firebaseio.com');
+  document.getElementById('wizConnectBtn').style.display = hasUrl ? 'flex' : 'none';
   wizGoto(syncReady() ? 3 : 1);
   document.getElementById('setupModal').classList.add('open');
 }
 function closeSetup(){ document.getElementById('setupModal').classList.remove('open'); }
 
 async function saveSetup(){
-  const apiKey = document.getElementById('fbApiKey').value.trim();
-  if(!apiKey){ alert('Bitte den API Key einfügen.'); return; }
+  const dbUrl = document.getElementById('fbDbUrl').value.trim().replace(/\/+$/,'');
+  if(!dbUrl || (!dbUrl.includes('firebasedatabase.app') && !dbUrl.includes('firebaseio.com'))){ alert('Bitte die Datenbank-URL einfügen.'); return; }
   const btn = document.getElementById('connectBtn');
-  if(btn){ btn.textContent='Erstelle Datenbank...'; btn.disabled=true; }
+  if(btn){ btn.textContent='Verbinde...'; btn.disabled=true; }
 
   try{
-    // Validate key with a lightweight check
-    const testR = await fetch('https://api.jsonbin.io/v3/b?limit=1', {
-      headers:{ 'X-Master-Key': apiKey }
-    });
-    if(testR.status===401) throw new Error('API Key ungültig oder falsch kopiert.\n\nBitte nochmal unter jsonbin.io → API Keys kopieren.');
+    // Test connection with a simple read
+    const testR = await fetch(`${dbUrl}/bobanschubcup.json`);
+    if(!testR.ok && testR.status !== 404) throw new Error('Datenbank nicht erreichbar (HTTP ' + testR.status + ').\n\nBitte prüfe ob die URL korrekt ist und die Datenbank im Testmodus gestartet wurde.');
 
-    // Auto-create a new bin
-    const createR = await fetch('https://api.jsonbin.io/v3/b', {
-      method: 'POST',
-      headers:{ 'Content-Type':'application/json', 'X-Master-Key': apiKey, 'X-Bin-Name':'bobanschubcup2026' },
-      body: JSON.stringify({ teams, nextId })
-    });
-    if(!createR.ok) throw new Error('Datenbank konnte nicht erstellt werden (HTTP ' + createR.status + ')');
-    const created = await createR.json();
-    const binId = (created.metadata && created.metadata.id) || created.id;
-    if(!binId) throw new Error('Bin ID konnte nicht ausgelesen werden.');
-
-    syncSaveConfig({ binId, apiKey });
-    await makeBinPublic(binId, apiKey); // make readable without key → short QR URL
-    if(btn){ btn.textContent='✓ Verbinden & Datenbank erstellen'; btn.disabled=false; }
+    syncSaveConfig({ dbUrl });
+    // Write initial data if DB is empty
+    const existing = await testR.json();
+    if(!existing || !existing.teams){
+      await fetch(`${dbUrl}/bobanschubcup.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ teams: teamsForSync(), nextId })
+      });
+    }
+    if(btn){ btn.textContent='✓ Verbinden'; btn.disabled=false; }
     syncStart();
     renderQR();
     setStatus('connected');
     wizGoto(3);
   } catch(e){
-    if(btn){ btn.textContent='✓ Verbinden & Datenbank erstellen'; btn.disabled=false; }
+    if(btn){ btn.textContent='✓ Verbinden'; btn.disabled=false; }
     alert('❌ Fehler:\n\n' + e.message);
     setStatus('error');
   }
@@ -970,8 +960,8 @@ async function saveSetup(){
 function clearSetup(){
   if(!confirm('Sync-Konfiguration löschen und nur lokal arbeiten?')) return;
   localStorage.removeItem(SYNC_KEY);
-  SYNC_CONFIG.binId=''; SYNC_CONFIG.apiKey='';
-  if(syncInterval){ clearInterval(syncInterval); syncInterval=null; }
+  SYNC_CONFIG.dbUrl='';
+  if(fbEventSource){ fbEventSource.close(); fbEventSource=null; }
   setStatus('offline');
   closeSetup();
   renderQR();
@@ -979,20 +969,11 @@ function clearSetup(){
 
 async function downloadConfigured(){
   const cfg = syncConfig()||{};
-  const binId  = cfg.binId||'';
-  const apiKey = cfg.apiKey||'';
-  if(!binId||!apiKey){ alert('Keine Sync-Konfiguration vorhanden.'); return; }
+  const dbUrl = cfg.dbUrl||'';
+  if(!dbUrl){ alert('Keine Sync-Konfiguration vorhanden.'); return; }
   try{
-    // Use outerHTML — works locally AND on Netlify (no fetch needed)
     let src = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Replace placeholder values in SYNC_CONFIG (script tag preserves original literals)
-    src = src.replace(/binId:\s*'[^']*'/, `binId:  '${binId}'`);
-    src = src.replace(/apiKey:\s*'[^']*'(\s*\/\/ z\.B\.)/, `apiKey: '${apiKey}'$1`);
-    if(!src.includes(binId)){
-      // Fallback: try a broader replacement
-      src = src.replace(/(const SYNC_CONFIG\s*=\s*\{[\s\S]*?binId:\s*)'[^']*'/, `$1'${binId}'`);
-      src = src.replace(/(const SYNC_CONFIG\s*=\s*\{[\s\S]*?apiKey:\s*)'[^']*'/, `$1'${apiKey}'`);
-    }
+    src = src.replace(/dbUrl:\s*'[^']*'/, `dbUrl: '${dbUrl}'`);
     const blob = new Blob([src], {type:'text/html'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1454,16 +1435,23 @@ function renderQR(){
     return;
   }
   const cfg = syncConfig();
-  const encoded = b64enc(cfg.binId + '|' + cfg.apiKey);
-  const baseUrl  = window.location.origin + window.location.pathname;
-  const resultsUrl = baseUrl + '?view=results#s=' + encoded;
-  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(resultsUrl)}&bgcolor=111318&color=f0f2f5&format=svg&ecc=M`;
+  const baseUrl = window.location.origin + window.location.pathname;
+  // If dbUrl is hardcoded in SYNC_CONFIG (not from hash/localStorage), QR needs no hash
+  const isHardcoded = !!SYNC_CONFIG.dbUrl;
+  const resultsUrl = isHardcoded
+    ? baseUrl + '?view=results'
+    : baseUrl + '?view=results#s=' + b64enc(cfg.dbUrl);
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(resultsUrl)}&bgcolor=111318&color=f0f2f5&format=svg&ecc=L&margin=2`;
   el.innerHTML = `
     <div class="qr-card">
       <div class="qr-label">QR-Code für Teilnehmende</div>
-      <img src="${qrApiUrl}" class="qr-img" alt="QR-Code Ergebnisse" onerror="this.parentElement.innerHTML='<div class=qr-error>QR-Code wird online generiert – bitte Internetverbindung prüfen</div>'" style="width:220px;height:220px">
+      <img src="${qrApiUrl}" class="qr-img" alt="QR-Code Ergebnisse" onerror="this.parentElement.innerHTML='<div class=qr-error>QR-Code wird online generiert – bitte Internetverbindung prüfen</div>'" style="width:260px;height:260px">
       <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-top:4px">Zugangsdaten eingebettet · kein Setup nötig</div>
       <a href="${resultsUrl}" target="_blank" class="qr-open-btn">↗ Ergebnisseite öffnen</a>
+      <details style="margin-top:8px;width:100%">
+        <summary style="font-size:0.7rem;color:var(--muted);cursor:pointer;text-align:center">Link manuell kopieren</summary>
+        <div style="font-size:0.62rem;color:var(--muted);word-break:break-all;background:var(--surface2);padding:6px 8px;border-radius:6px;margin-top:4px;user-select:all">${resultsUrl}</div>
+      </details>
     </div>`;
 }
 </script>
