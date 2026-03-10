@@ -689,6 +689,10 @@ body.results-mode .sync-status.status-off {
       <span style="font-size:0.75rem;color:var(--muted)">Verbindung trennen:</span>
       <button class="mbtn mbtn-s" onclick="clearSetup()" style="flex:0 0 auto;padding:5px 14px;font-size:0.78rem;color:var(--danger);border-color:rgba(239,68,68,0.3)">Trennen</button>
     </div>
+    <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:0.75rem;color:var(--muted)">Fotos fehlen in Firebase:</span>
+      <button class="mbtn mbtn-s" onclick="repushAllThumbs()" style="flex:0 0 auto;padding:5px 14px;font-size:0.78rem">📸 Fotos neu pushen</button>
+    </div>
   </div>
 </div>
 
@@ -838,14 +842,17 @@ function applyRemoteData(data){
   setStatus('connected');
   if(!isResultsView) renderAdmin();
   if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
-  // Wenn nach dem Sync Fotos lokal vorhanden aber Thumbnails fehlen → neu generieren & pushen
+  // Wenn Fotos lokal vorhanden aber Thumbnails in Firebase fehlen → neu generieren & pushen
   const missingThumbs = teams.filter(t => t.photo && !t.photoThumb);
   if(missingThumbs.length > 0){
     let done = 0;
     missingThumbs.forEach(t => {
       makeSyncThumb(t.photo, thumb => {
         t.photoThumb = thumb;
-        if(++done === missingThumbs.length) syncPush();
+        if(++done === missingThumbs.length){
+          lastSyncHash = ''; // Reset damit syncPush nicht als eigene Änderung gefiltert wird
+          syncPush();
+        }
       });
     });
   }
@@ -987,6 +994,22 @@ async function saveSetup(){
     alert('❌ Fehler:\n\n' + e.message);
     setStatus('error');
   }
+}
+
+function repushAllThumbs(){
+  const withPhotos = teams.filter(t => t.photo);
+  if(!withPhotos.length){ alert('Keine lokalen Fotos gefunden.'); return; }
+  let done = 0;
+  withPhotos.forEach(t => {
+    makeSyncThumb(t.photo, thumb => {
+      t.photoThumb = thumb;
+      if(++done === withPhotos.length){
+        lastSyncHash = '';
+        syncPush();
+        alert(`✅ ${withPhotos.length} Foto(s) erfolgreich zu Firebase gepusht.`);
+      }
+    });
+  });
 }
 
 function clearSetup(){
