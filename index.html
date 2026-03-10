@@ -807,18 +807,29 @@ async function syncPush(){
 }
 
 function applyRemoteData(data){
-  if(!data || !data.teams) return;
-  // Strip full photos from incoming data — only thumbs are synced
-  const safeTeams = data.teams.map(t => {
+  if(!data) return;
+  // Firebase kann Arrays als Objekte zurückgeben (z.B. nach Löschvorgängen)
+  // Konvertiere beides sicher zu einem echten Array
+  let rawTeams = data.teams;
+  if(!rawTeams) return;
+  if(!Array.isArray(rawTeams)){
+    rawTeams = Object.values(rawTeams).filter(Boolean);
+  }
+  if(!rawTeams.length) return;
+
+  // Strip full photos — only thumbs sync via Firebase
+  const safeTeams = rawTeams.map(t => {
+    if(!t || typeof t !== 'object') return null;
     const {photo, ...rest} = t; // eslint-disable-line no-unused-vars
     return rest;
-  });
+  }).filter(Boolean);
+
   const safe = { ...data, teams: safeTeams };
   const hash = JSON.stringify(safe);
   if(hash === lastSyncHash) return; // eigene Änderung, ignorieren
   lastSyncHash = hash;
   teams  = safe.teams;
-  nextId = safe.nextId || Math.max(0,...safe.teams.map(t=>t.id))+1;
+  nextId = safe.nextId || Math.max(0,...safe.teams.map(t=>t.id||0))+1;
   // Persist incoming thumbnails to localStorage
   const pm = {}; try{ Object.assign(pm, JSON.parse(localStorage.getItem('bpch26_photos')||'{}')); }catch(e){}
   teams.forEach(t=>{ if(t.photoThumb && !pm[t.id]) pm[t.id] = t.photoThumb; });
