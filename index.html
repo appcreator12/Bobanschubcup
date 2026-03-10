@@ -838,6 +838,17 @@ function applyRemoteData(data){
   setStatus('connected');
   if(!isResultsView) renderAdmin();
   if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
+  // Wenn nach dem Sync Fotos lokal vorhanden aber Thumbnails fehlen → neu generieren & pushen
+  const missingThumbs = teams.filter(t => t.photo && !t.photoThumb);
+  if(missingThumbs.length > 0){
+    let done = 0;
+    missingThumbs.forEach(t => {
+      makeSyncThumb(t.photo, thumb => {
+        t.photoThumb = thumb;
+        if(++done === missingThumbs.length) syncPush();
+      });
+    });
+  }
 }
 
 function syncStart(){
