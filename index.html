@@ -758,12 +758,12 @@ function syncCanWrite(){ return syncReady(); }
 function makeSyncThumb(dataUrl, cb){
   const img = new Image();
   img.onload = function(){
-    const SIZE = 48;
+    const SIZE = 120;
     let w = img.width, h = img.height;
     if(w > h){ h = Math.round(h*SIZE/w); w=SIZE; } else { w=Math.round(w*SIZE/h); h=SIZE; }
     const c = document.createElement('canvas'); c.width=w; c.height=h;
     c.getContext('2d').drawImage(img,0,0,w,h);
-    cb(c.toDataURL('image/jpeg', 0.35));
+    cb(c.toDataURL('image/jpeg', 0.65));
   };
   img.src = dataUrl;
 }
