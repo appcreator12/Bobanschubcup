@@ -862,33 +862,36 @@ function syncStart(){
   if(fbEventSource){ fbEventSource.close(); fbEventSource=null; }
   const c = syncConfig();
   if(!c) return;
-  // Firebase Realtime Database supports Server-Sent Events natively via EventSource
-  // EventSource automatically sends Accept: text/event-stream — no query param needed
   const sseUrl = `${c.dbUrl}/bobanschubcup.json`;
   fbEventSource = new EventSource(sseUrl);
+
+  let errTimer = null;
+
+  function onSuccess(){
+    if(errTimer){ clearTimeout(errTimer); errTimer=null; }
+    setStatus('connected');
+  }
+
   fbEventSource.addEventListener('put', e => {
     try{
       const msg = JSON.parse(e.data);
       if(msg.data) applyRemoteData(msg.data);
-      setStatus('connected'); // reset status on successful data
+      onSuccess();
     }catch(err){ console.warn('SSE parse error', err); }
   });
   fbEventSource.addEventListener('patch', e => {
     try{
       const msg = JSON.parse(e.data);
       if(msg.data) applyRemoteData(msg.data);
-      setStatus('connected');
+      onSuccess();
     }catch(err){}
   });
-  // EventSource reconnects automatically — only show error after multiple failures
-  let errCount = 0;
+  // EventSource reconnects automatically after errors — only show error after 10s without recovery
   fbEventSource.onerror = () => {
-    errCount++;
-    if(errCount >= 3) setStatus('error');
-    // EventSource will auto-reconnect; reset counter on next successful message
+    if(!errTimer){
+      errTimer = setTimeout(()=>{ setStatus('error'); errTimer=null; }, 10000);
+    }
   };
-  const origApply = applyRemoteData;
-  fbEventSource.addEventListener('put', () => { errCount = 0; }, true);
 }
 
 function save(){
