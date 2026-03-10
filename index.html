@@ -841,15 +841,25 @@ function syncStart(){
     try{
       const msg = JSON.parse(e.data);
       if(msg.data) applyRemoteData(msg.data);
+      setStatus('connected'); // reset status on successful data
     }catch(err){ console.warn('SSE parse error', err); }
   });
   fbEventSource.addEventListener('patch', e => {
     try{
       const msg = JSON.parse(e.data);
       if(msg.data) applyRemoteData(msg.data);
+      setStatus('connected');
     }catch(err){}
   });
-  fbEventSource.onerror = () => setStatus('error');
+  // EventSource reconnects automatically — only show error after multiple failures
+  let errCount = 0;
+  fbEventSource.onerror = () => {
+    errCount++;
+    if(errCount >= 3) setStatus('error');
+    // EventSource will auto-reconnect; reset counter on next successful message
+  };
+  const origApply = applyRemoteData;
+  fbEventSource.addEventListener('put', () => { errCount = 0; }, true);
 }
 
 function save(){
@@ -1003,7 +1013,13 @@ function gotoPage(p,el){
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   document.getElementById(p+'Page').classList.add('active');
   el.classList.add('active');
-  if(p==='results')renderResults();
+  if(p==='results'){
+    renderResults();
+    // Reconnect if EventSource was closed or errored
+    if(syncReady() && (!fbEventSource || fbEventSource.readyState === EventSource.CLOSED)){
+      syncStart();
+    }
+  }
 }
 
 // ── ADMIN ──
@@ -1421,6 +1437,15 @@ window.addEventListener('resize',()=>{
   if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
 });
 
+function getQrBaseUrl(){
+  const saved = localStorage.getItem('bpch26_vercelUrl')||'';
+  if(saved) return saved.replace(/\/+$/,'');
+  const loc = window.location.origin + window.location.pathname;
+  // If running locally (file:// or localhost), return empty to trigger URL prompt
+  if(loc.startsWith('file:') || loc.includes('localhost') || loc.includes('127.0.0.1')) return '';
+  return loc.replace(/\/+$/,'');
+}
+
 function renderQR(){
   const el = document.getElementById('qrBlock');
   if(!el) return;
@@ -1434,24 +1459,33 @@ function renderQR(){
       </div>`;
     return;
   }
-  const cfg = syncConfig();
-  const baseUrl = window.location.origin + window.location.pathname;
-  // If dbUrl is hardcoded in SYNC_CONFIG (not from hash/localStorage), QR needs no hash
-  const isHardcoded = !!SYNC_CONFIG.dbUrl;
-  const resultsUrl = isHardcoded
-    ? baseUrl + '?view=results'
-    : baseUrl + '?view=results#s=' + b64enc(cfg.dbUrl);
+  const baseUrl = getQrBaseUrl();
+  if(!baseUrl){
+    el.innerHTML=`
+      <div class="qr-card">
+        <div class="qr-label">QR-Code für Teilnehmende</div>
+        <p style="color:var(--muted);font-size:0.82rem;text-align:center;line-height:1.7;margin-bottom:14px">
+          Bitte die <strong style="color:var(--text)">Vercel-URL</strong> der App eingeben<br>damit der QR-Code generiert werden kann.
+        </p>
+        <input id="vercelUrlInput" class="field-input" type="text" placeholder="https://meinprojekt.vercel.app"
+          style="margin-bottom:10px;font-size:0.82rem">
+        <button class="mbtn mbtn-p" style="width:100%" onclick="
+          const v=document.getElementById('vercelUrlInput').value.trim();
+          if(v.startsWith('https://')){localStorage.setItem('bpch26_vercelUrl',v);renderQR();}
+          else alert('Bitte eine vollständige URL eingeben (https://...)');
+        ">✓ QR-Code generieren</button>
+      </div>`;
+    return;
+  }
+  const resultsUrl = baseUrl + '?view=results';
   const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(resultsUrl)}&bgcolor=111318&color=f0f2f5&format=svg&ecc=L&margin=2`;
   el.innerHTML = `
     <div class="qr-card">
       <div class="qr-label">QR-Code für Teilnehmende</div>
       <img src="${qrApiUrl}" class="qr-img" alt="QR-Code Ergebnisse" onerror="this.parentElement.innerHTML='<div class=qr-error>QR-Code wird online generiert – bitte Internetverbindung prüfen</div>'" style="width:260px;height:260px">
-      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-top:4px">Zugangsdaten eingebettet · kein Setup nötig</div>
+      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin-top:4px">↓ ${resultsUrl}</div>
       <a href="${resultsUrl}" target="_blank" class="qr-open-btn">↗ Ergebnisseite öffnen</a>
-      <details style="margin-top:8px;width:100%">
-        <summary style="font-size:0.7rem;color:var(--muted);cursor:pointer;text-align:center">Link manuell kopieren</summary>
-        <div style="font-size:0.62rem;color:var(--muted);word-break:break-all;background:var(--surface2);padding:6px 8px;border-radius:6px;margin-top:4px;user-select:all">${resultsUrl}</div>
-      </details>
+      <button onclick="localStorage.removeItem('bpch26_vercelUrl');renderQR()" style="background:none;border:none;color:var(--muted);font-size:0.7rem;cursor:pointer;margin-top:4px">URL ändern</button>
     </div>`;
 }
 </script>
