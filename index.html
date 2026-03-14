@@ -1898,9 +1898,9 @@ function drawUrkunde(doc, team, W, H, logoB64, bobBgB64, dateStr){
   // Platzierung in Gold
   const platzText=['','1. Platz','2. Platz','3. Platz'][team.platz]||(team.platz+'. Platz');
   doc.setFont(PFONT(),'bold');
-  doc.setFontSize(18);
+  doc.setFontSize(32);
   doc.setTextColor(...GOLD);
-  doc.text(platzText.toUpperCase(), W/2, 167, {align:'center'});
+  doc.text(platzText.toUpperCase(), W/2, 169, {align:'center'});
 
   // Goldene Trennlinie
   doc.setFillColor(...GOLD);
