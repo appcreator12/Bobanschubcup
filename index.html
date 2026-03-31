@@ -558,7 +558,7 @@ body.results-mode .sync-status.status-off {
         <span id="syncStatus" class="sync-status status-off" onclick="if(!isResultsView)openSetup()" title="Live-Sync einrichten" style="cursor:pointer">💾 Nur lokal</span>
         <button class="pdf-btn pdf-btn-green" onclick="downloadStartaufstellung()" title="Startreihenfolge als PDF">🚦 Startaufstellung</button>
         <button class="pdf-btn" onclick="downloadErgebnisse()" title="Ergebnistabelle als PDF">📄 Endergebnisse</button>
-        <button class="pdf-btn pdf-btn-gold" onclick="downloadUrkunden()" title="Urkunden für alle Teams">🏆 Urkunden</button>
+        <button class="pdf-btn pdf-btn-gold" id="urkundeBtn" onclick="downloadUrkunden()" title="Urkunden für alle Teams" disabled style="opacity:0.4;cursor:not-allowed">🏆 Urkunden</button>
       </div>
     </div>
   </div>
@@ -1386,6 +1386,15 @@ function updateRunChip(){
 // ── RESULTS ──
 function renderResults(){
   updateRunChip();
+  // ── Urkunde button: nur aktiv wenn alle Teams beide Läufe haben ──
+  const urkundeBtn = document.getElementById('urkundeBtn');
+  if(urkundeBtn){
+    const allDone = teams.length > 0 && teams.every(t => pt(t.run1)!==null && pt(t.run2)!==null);
+    urkundeBtn.disabled = !allDone;
+    urkundeBtn.style.opacity = allDone ? '1' : '0.4';
+    urkundeBtn.style.cursor = allDone ? 'pointer' : 'not-allowed';
+    urkundeBtn.title = allDone ? 'Urkunden für alle Teams' : 'Erst wenn alle Ergebnisse vorliegen';
+  }
   const r=ranked();
   const lanes=document.getElementById('trackLanes');
   const rl=document.getElementById('rankList');
@@ -1445,9 +1454,10 @@ function bobSVG(t){
   const c=t.color,uid=t.id;
   let embl;
   if(t.photo){
-    embl=`<image href="${t.photo}" x="32" y="8" width="22" height="18" clip-path="url(#cp${uid})" preserveAspectRatio="xMidYMid slice"/>`;
+    embl=`<image href="${t.photo}" x="29" y="6" width="28" height="22" clip-path="url(#cp${uid})" preserveAspectRatio="xMidYMid slice"/>`;
   } else {
-    embl=`<text x="43" y="20" font-size="13" text-anchor="middle" dominant-baseline="middle">${t.emoji}</text>`;
+    embl=`<circle cx="43" cy="17" r="11" fill="rgba(255,255,255,0.22)"/>
+    <text x="43" y="17" font-size="15" text-anchor="middle" dominant-baseline="central">${t.emoji}</text>`;
   }
   return`<svg viewBox="0 0 90 40" xmlns="http://www.w3.org/2000/svg" style="width:90px;height:40px;filter:drop-shadow(1px 3px 7px rgba(0,0,0,0.45))">
     <defs>
@@ -1455,14 +1465,13 @@ function bobSVG(t){
         <stop offset="0%" stop-color="${c}"/>
         <stop offset="100%" stop-color="${c}" stop-opacity="0.55"/>
       </linearGradient>
-      <clipPath id="cp${uid}"><ellipse cx="43" cy="18" rx="12" ry="9"/></clipPath>
+      <clipPath id="cp${uid}"><ellipse cx="43" cy="18" rx="14" ry="11"/></clipPath>
     </defs>
     <rect x="5" y="32" width="78" height="5" rx="2.5" fill="#9ca3af" opacity="0.65"/>
     <rect x="8" y="34" width="72" height="2" rx="1" fill="#e5e7eb" opacity="0.8"/>
     <path d="M3 31 Q3 11 14 10 L70 10 Q85 10 85 21 L85 31 Z" fill="url(#g${uid})"/>
     <path d="M3 31 L3 18 Q3 10 14 10 L18 10 L6 31 Z" fill="${c}"/>
     <path d="M18 10 L70 10 L70 14 L18 14 Z" fill="rgba(255,255,255,0.1)"/>
-    <ellipse cx="43" cy="15" rx="16" ry="6" fill="rgba(186,230,253,0.18)" stroke="rgba(255,255,255,0.22)" stroke-width="0.8"/>
     ${embl}
     <path d="M20 11 Q43 8 68 11" stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none"/>
     <rect x="79" y="14" width="4" height="13" rx="2" fill="${c}" opacity="0.7"/>
@@ -1821,12 +1830,9 @@ function drawUrkunde(doc, team, W, H, logoB64, bobBgB64, dateStr){
     doc.setGState(new doc.GState({opacity:1}));
   }catch(e){}
 
-  // ── 4 Rotary Logos ──
-  const lw=52, lh=19;
-  logo3D(10, 8, lw, lh);
-  logo3D(W-10-lw, 8, lw, lh);
-  logo3D(10, H-10-lh, lw, lh);
-  logo3D(W-10-lw, H-10-lh, lw, lh);
+  // ── 1 Logo zentriert unten ──
+  const lw=88, lh=27;
+  try{ doc.addImage(logoB64,'PNG', W/2-lw/2, H-5-lh, lw, lh); }catch(e){}
 
   // ── URKUNDE ──
   doc.setFont(PFONT(),'bold');
