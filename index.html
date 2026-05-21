@@ -1886,9 +1886,15 @@ function drawUrkunde(doc, team, W, H, logoB64, bobBgB64, dateStr){
   doc.setTextColor(180,200,230);
   doc.text('Für die erfolgreiche Teilnahme der Mannschaft:', W/2, 113, {align:'center'});
 
-  // ── Teamname – weiss, gross, kursiv ──
+  // ── Teamname – weiss, gross, kursiv, autoscale ──
   doc.setFont(PFONT(),'bolditalic');
-  doc.setFontSize(36);
+  let nameFontSize = 36;
+  doc.setFontSize(nameFontSize);
+  const maxNameWidth = W - 28;
+  while(doc.getTextWidth(team.name) > maxNameWidth && nameFontSize > 14){
+    nameFontSize -= 1;
+    doc.setFontSize(nameFontSize);
+  }
   doc.setTextColor(...WHITE);
   doc.text(team.name, W/2, 139, {align:'center'});
 
