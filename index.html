@@ -1456,8 +1456,8 @@ function bobSVG(t){
   if(t.photo){
     embl=`<image href="${t.photo}" x="29" y="6" width="28" height="22" clip-path="url(#cp${uid})" preserveAspectRatio="xMidYMid slice"/>`;
   } else {
-    embl=`<circle cx="43" cy="17" r="11" fill="rgba(255,255,255,0.22)"/>
-    <text x="43" y="17" font-size="15" text-anchor="middle" dominant-baseline="central">${t.emoji}</text>`;
+    embl=`<rect x="32" y="6" width="22" height="19" rx="2" fill="rgba(255,255,255,0.22)"/>
+    <text x="43" y="17" font-size="20" text-anchor="middle" dominant-baseline="central">${t.emoji}</text>`;
   }
   return`<svg viewBox="0 0 90 40" xmlns="http://www.w3.org/2000/svg" style="width:90px;height:40px;filter:drop-shadow(1px 3px 7px rgba(0,0,0,0.45))">
     <defs>
@@ -1465,7 +1465,7 @@ function bobSVG(t){
         <stop offset="0%" stop-color="${c}"/>
         <stop offset="100%" stop-color="${c}" stop-opacity="0.55"/>
       </linearGradient>
-      <clipPath id="cp${uid}"><ellipse cx="43" cy="18" rx="14" ry="11"/></clipPath>
+      <clipPath id="cp${uid}"><rect x="29" y="6" width="28" height="22" rx="2"/></clipPath>
     </defs>
     <rect x="5" y="32" width="78" height="5" rx="2.5" fill="#9ca3af" opacity="0.65"/>
     <rect x="8" y="34" width="72" height="2" rx="1" fill="#e5e7eb" opacity="0.8"/>
