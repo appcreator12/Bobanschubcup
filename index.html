@@ -584,7 +584,7 @@ body.results-mode .sync-status.status-off {
     <div class="modal-title">Mannschaft hinzufügen</div>
     <div class="field">
       <label class="field-label">Teamname</label>
-      <input class="field-input" id="mName" type="text" placeholder="z. B. Die Eisteufel" maxlength="22">
+      <input class="field-input" id="mName" type="text" placeholder="z. B. Die Eisteufel">
     </div>
     <div class="field">
       <label class="field-label">Emblem</label>
@@ -1109,7 +1109,7 @@ function renderAdmin(){
       </div>
       <div>
         <input class="team-name-inp" id="nm-${t.id}" value="${t.name}"
-          onchange="renameTeam(${t.id},this.value)" maxlength="22"
+          onchange="renameTeam(${t.id},this.value)"
           title="Name bearbeiten">
         <div class="team-badge" style="color:${t.color}">${t.photo?'📷 Foto':t.emoji+' Emoji'}</div>
       </div>
