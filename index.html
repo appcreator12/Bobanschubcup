@@ -1880,20 +1880,17 @@ function drawUrkunde(doc, team, W, H, logoB64, bobBgB64, dateStr){
 
   // ── Team-Logo oben mittig ──
   if(team._logoUrl){
-    const lsz = 30, lx = W/2 - lsz/2, ly = 8;
-    // Weißer Hintergrundkreis
-    doc.setFillColor(...WHITE);
-    doc.setGState(new doc.GState({opacity:0.15}));
-    doc.circle(W/2, ly + lsz/2, lsz/2 + 2, 'F');
-    doc.setGState(new doc.GState({opacity:1}));
-    // Goldener Rand
-    doc.setDrawColor(...GOLD);
-    doc.setLineWidth(1.0);
-    doc.circle(W/2, ly + lsz/2, lsz/2 + 2, 'S');
-    // Logo
     try{
       const fmt = (team._logoUrl && team._logoUrl.includes('image/jpeg')) ? 'JPEG' : 'PNG';
-      doc.addImage(team._logoUrl, fmt, lx, ly, lsz, lsz);
+      const maxW = 36, maxH = 28, ly = 7;
+      const props = doc.getImageProperties(team._logoUrl);
+      const ratio = props.width / props.height;
+      let iw, ih;
+      if(ratio >= 1){ iw = maxW; ih = maxW / ratio; }
+      else           { ih = maxH; iw = maxH * ratio; }
+      const lx = W/2 - iw/2;
+      const ily = ly + (maxH - ih) / 2;
+      doc.addImage(team._logoUrl, fmt, lx, ily, iw, ih);
     }catch(e){}
   }
 
