@@ -302,9 +302,9 @@ body.results-mode .sync-status.status-off {
 .finish-label {
   position: absolute; top: 36px; left: 50%; transform: translateX(-50%);
   font-family: 'Poppins', sans-serif; font-weight: 800;
-  font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase;
-  color: rgba(255,255,255,0.85); white-space: nowrap;
-  text-shadow: 0 0 8px rgba(59,130,246,0.9);
+  font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
+  color: #F7A81B; white-space: nowrap;
+  text-shadow: 0 0 8px rgba(0,58,112,0.9);
 }
 
 .track-lanes-wrap { position: relative; padding: 12px 90px 12px 20px; display: flex; flex-direction: column; gap: 0; overflow: visible; }
@@ -1403,7 +1403,14 @@ function updateRunChip(){
 // ── RESULTS ──
 function renderResults(){
   updateRunChip();
-  // ── Urkunde button: nur aktiv wenn alle Teams beide Läufe haben ──
+  // ── Ziellinie bis zum letzten Bob verlängern ──
+  const trackLanes = document.getElementById('trackLanes');
+  const finishGate = document.querySelector('.finish-gate');
+  if(trackLanes && finishGate){
+    finishGate.style.height = trackLanes.scrollHeight + 'px';
+    finishGate.style.top = '0';
+    finishGate.style.bottom = 'auto';
+  }
   const urkundeBtn = document.getElementById('urkundeBtn');
   if(urkundeBtn){
     const allDone = teams.length > 0 && teams.every(t => pt(t.run1)!==null && pt(t.run2)!==null);
@@ -1792,6 +1799,19 @@ async function downloadErgebnisse(){
 }
 
 // ── Urkunden ── alle Teams als einzelne PDF-Seiten in EINEM Dokument
+// Helper: Emoji via Canvas in PNG-DataURL rendern
+function emojiToDataURL(emoji, size=90){
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+  ctx.font = `${Math.round(size*0.7)}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(emoji, size/2, size/2);
+  return canvas.toDataURL('image/png');
+}
+
 async function downloadUrkunden(){
   const { jsPDF } = window.jspdf;
   if(!jsPDF){ alert('PDF-Bibliothek wird noch geladen, bitte kurz warten.'); return; }
@@ -1806,6 +1826,11 @@ async function downloadUrkunden(){
   ensurePoppins(doc);
   const W = doc.internal.pageSize.getWidth();
   const H = doc.internal.pageSize.getHeight();
+
+  // ── Team-Logos vorrendern ──
+  data.forEach(team => {
+    team._logoUrl = team.photo || emojiToDataURL(team.emoji);
+  });
 
   data.forEach((team, idx) => {
     if(idx > 0) doc.addPage('a4', 'portrait');
@@ -1851,6 +1876,25 @@ function drawUrkunde(doc, team, W, H, logoB64, bobBgB64, dateStr){
   // ── 1 Logo zentriert unten ──
   const lw=88, lh=27;
   try{ doc.addImage(logoB64,'PNG', W/2-lw/2, H-5-lh, lw, lh); }catch(e){}
+
+  // ── Team-Logo oben mittig ──
+  if(team._logoUrl){
+    const lsz = 30, lx = W/2 - lsz/2, ly = 8;
+    // Weißer Hintergrundkreis
+    doc.setFillColor(...WHITE);
+    doc.setGState(new doc.GState({opacity:0.15}));
+    doc.circle(W/2, ly + lsz/2, lsz/2 + 2, 'F');
+    doc.setGState(new doc.GState({opacity:1}));
+    // Goldener Rand
+    doc.setDrawColor(...GOLD);
+    doc.setLineWidth(1.0);
+    doc.circle(W/2, ly + lsz/2, lsz/2 + 2, 'S');
+    // Logo
+    try{
+      const fmt = team.photo ? 'JPEG' : 'PNG';
+      doc.addImage(team._logoUrl, fmt, lx, ly, lsz, lsz);
+    }catch(e){}
+  }
 
   // ── URKUNDE ──
   doc.setFont(PFONT(),'bold');
