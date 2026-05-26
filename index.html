@@ -507,12 +507,13 @@ body.results-mode .sync-status.status-off {
   .finish-gate-checks { width: 14px; }
   .finish-gate-bar { width: 14px; }
   .finish-flag-top { font-size: 1.3rem; }
-  .finish-label { font-size: 0.45rem; top: 28px; }
+  .finish-label { font-size: 0.85rem; top: 32px; }
 
-  /* Rank panel: 2-column wrap on mobile */
+  /* Rank panel: single column on mobile, no horizontal scroll */
+  .rank-panel { overflow-x: hidden; }
   #rankList { 
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 5px;
     min-width: unset;
     width: 100%;
@@ -526,7 +527,7 @@ body.results-mode .sync-status.status-off {
 
 @media (max-width: 380px) {
   .results-h1 { font-size: 1.1rem; }
-  #rankList { grid-template-columns: 1fr; }
+  #rankList { flex-direction: column; }
   .lane { height: 40px; }
 }
 </style>
