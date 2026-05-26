@@ -1617,7 +1617,7 @@ function getPdfData(){
       mittel: a !== null ? ft(a) : '—',
       color: t.color,
       emoji: t.emoji,
-      photo: photoMap[t.id] || null,
+      photo: t.photo || photoMap[t.id] || null,
     };
   });
 }
@@ -1892,7 +1892,7 @@ function drawUrkunde(doc, team, W, H, logoB64, bobBgB64, dateStr){
     doc.circle(W/2, ly + lsz/2, lsz/2 + 2, 'S');
     // Logo
     try{
-      const fmt = team.photo ? 'JPEG' : 'PNG';
+      const fmt = (team._logoUrl && team._logoUrl.includes('image/jpeg')) ? 'JPEG' : 'PNG';
       doc.addImage(team._logoUrl, fmt, lx, ly, lsz, lsz);
     }catch(e){}
   }
