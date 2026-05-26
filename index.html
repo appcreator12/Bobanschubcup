@@ -1617,6 +1617,7 @@ function getPdfData(){
       mittel: a !== null ? ft(a) : '—',
       color: t.color,
       emoji: t.emoji,
+      photo: photoMap[t.id] || null,
     };
   });
 }
