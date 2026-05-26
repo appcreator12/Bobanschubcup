@@ -502,6 +502,9 @@ body.results-mode .sync-status.status-off {
   .rank-left { width: 24px; }
   .rank-pill { font-size: 0.55rem; padding: 2px 4px; min-width: 20px; }
 
+  /* Track: kein innerer Scroll auf Mobil – Seite scrollt selbst */
+  .track-outer { overflow-y: visible; max-height: none; }
+
   /* Finish gate smaller */
   .finish-gate { right: 20px; width: 36px; }
   .finish-gate-checks { width: 14px; }
@@ -1408,7 +1411,8 @@ function renderResults(){
   const trackLanes = document.getElementById('trackLanes');
   const finishGate = document.querySelector('.finish-gate');
   if(trackLanes && finishGate){
-    finishGate.style.height = trackLanes.scrollHeight + 'px';
+    const h = trackLanes.getBoundingClientRect().height || trackLanes.offsetHeight;
+    finishGate.style.height = h + 'px';
     finishGate.style.top = '0';
     finishGate.style.bottom = 'auto';
   }
