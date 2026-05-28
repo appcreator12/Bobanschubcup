@@ -858,7 +858,12 @@ function applyRemoteData(data){
   const hash = JSON.stringify(safe);
   if(hash === lastSyncHash) return; // eigene Änderung, ignorieren
   lastSyncHash = hash;
+  // Vorhandene photoThumb-Werte aus altem Array retten
+  const oldThumbs = {};
+  teams.forEach(t=>{ if(t.photoThumb) oldThumbs[t.id] = t.photoThumb; });
   teams  = safe.teams;
+  // Thumbnails aus altem Array übernehmen wenn Firebase noch keinen liefert
+  teams.forEach(t=>{ if(!t.photoThumb && oldThumbs[t.id]) t.photoThumb = oldThumbs[t.id]; });
   nextId = safe.nextId || Math.max(0,...safe.teams.map(t=>t.id||0))+1;
   // Persist incoming thumbnails to localStorage
   const pm = {}; try{ Object.assign(pm, JSON.parse(localStorage.getItem('bpch26_photos')||'{}')); }catch(e){}
@@ -932,8 +937,12 @@ function save(){
   } else {
     let done = 0;
     pending.forEach(t => {
+      const capturedId = t.id;
       makeSyncThumb(t.photo, thumb => {
-        t.photoThumb = thumb;
+        // Immer aktuelles Team-Objekt aus dem jetzt gültigen Array holen
+        const current = teams.find(x => x.id === capturedId);
+        if(current) current.photoThumb = thumb;
+        photoCacheSet(capturedId, current ? current.photo : t.photo);
         if(++done === pending.length){
           if(syncReady()) syncPush();
         }
