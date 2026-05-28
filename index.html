@@ -1093,8 +1093,9 @@ function sortKey(t){const a=avg(t);if(a!==null)return a;const r1=pt(t.run1),r2=p
 function ranked(){return[...teams].sort((a,b)=>{const aa=sortKey(a),bb=sortKey(b);if(aa===null&&bb===null)return 0;if(aa===null)return 1;if(bb===null)return-1;return aa-bb;});}
 
 function emblInner(t,size,radius){
-  if(t.photo)return`<img src="${t.photo}" style="width:${size}px;height:${size}px;border-radius:${radius}px;object-fit:cover">`;
-  return`<span style="font-size:${Math.round(size*0.52)}px">${t.emoji}</span>`;
+  const src = t.photo || t.photoThumb;
+  if(src) return`<img src="${src}" style="width:${size}px;height:${size}px;border-radius:${radius}px;object-fit:contain;background:#f1f5f9">`;
+  return`<span style="font-size:${Math.round(size*0.62)}px;line-height:1">${t.emoji}</span>`;
 }
 
 function gotoPage(p,el){
@@ -1464,7 +1465,7 @@ function renderResults(){
     const m=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
     return`<div class="panel-row">
       <div class="panel-rank" style="color:${rank===1?'#f59e0b':rank===2?'#94a3b8':rank===3?'#b45309':'#6b7280'}">${m||rank}</div>
-      <div class="panel-av">${emblInner(t,28,5)}</div>
+      <div class="panel-av">${emblInner(t,44,5)}</div>
       <div class="panel-info"><div class="panel-name">${t.name}</div><div class="panel-t">${timeLabel}</div></div>
     </div>`;
   }).join('');
