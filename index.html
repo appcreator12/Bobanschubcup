@@ -1192,6 +1192,7 @@ function attachAvatarListeners(){
           const team = teams.find(x=>x.id===t.id);
           if(!team) return;
           team.photo = dataUrl;
+          team.photoThumb = null; // alten Thumbnail löschen → erzwingt Neugenerierung
           photoCacheSet(team.id, dataUrl);
           try{ save(); }catch(err){ console.warn('Save error:', err); }
           renderAdmin();
