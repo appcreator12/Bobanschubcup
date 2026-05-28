@@ -718,6 +718,10 @@ body.results-mode .sync-status.status-off {
 
 <script>
 let teams=[], nextId=1, selEmoji='😈', selColor='#3b82f6', photoDataUrl=null, emblMode='emoji';
+// Globaler Foto-Cache – bleibt über syncIn() hinaus erhalten, key = String(team.id)
+const photoCache = {};
+function photoCacheSet(id, dataUrl){ if(dataUrl) photoCache[String(id)] = dataUrl; }
+function photoCacheGet(id){ return photoCache[String(id)] || null; }
 const EMOJIS=['😈','❄️','⚡','🚀','🦁','🐺','🦊','🐻','🦅','🐯','💎','🔥','🌊','⭐','🎯','🏆','🦄','🐲','👊','🎽'];
 const COLORS=[
   '#e63946','#f4722b','#f59e0b','#eab308','#84cc16',
@@ -802,14 +806,16 @@ function teamsWithoutPhotos(){ return teamsForSync(); }
 
 function savePhotosLocally(){
   const photoMap = {};
-  teams.forEach(t=>{ if(t.photo) photoMap[t.id] = t.photo; });
+  teams.forEach(t=>{ if(t.photo){ photoMap[t.id] = t.photo; photoCacheSet(t.id, t.photo); } });
   try{ localStorage.setItem('bpch26_photos', JSON.stringify(photoMap)); }catch(e){}
 }
 function loadPhotosFromLocal(){
   try{
     const pm = JSON.parse(localStorage.getItem('bpch26_photos')||'{}');
+    // Cache mit allen localStorage-Fotos befüllen
+    Object.keys(pm).forEach(k=>{ if(pm[k]) photoCacheSet(k, pm[k]); });
     // Prefer full-quality local photo; fall back to sync thumbnail
-    teams.forEach(t=>{ t.photo = pm[t.id] || t.photoThumb || null; });
+    teams.forEach(t=>{ t.photo = photoCacheGet(t.id) || t.photoThumb || null; });
   }catch(e){}
 }
 
@@ -1093,7 +1099,7 @@ function sortKey(t){const a=avg(t);if(a!==null)return a;const r1=pt(t.run1),r2=p
 function ranked(){return[...teams].sort((a,b)=>{const aa=sortKey(a),bb=sortKey(b);if(aa===null&&bb===null)return 0;if(aa===null)return 1;if(bb===null)return-1;return aa-bb;});}
 
 function emblInner(t,size,radius){
-  const src = t.photo || t.photoThumb;
+  const src = photoCacheGet(t.id) || t.photo || t.photoThumb;
   if(src) return`<img src="${src}" style="width:${size}px;height:${size}px;border-radius:${radius}px;object-fit:contain;background:#f1f5f9">`;
   return`<span style="font-size:${Math.round(size*0.62)}px;line-height:1">${t.emoji}</span>`;
 }
@@ -1177,6 +1183,7 @@ function attachAvatarListeners(){
           const team = teams.find(x=>x.id===t.id);
           if(!team) return;
           team.photo = dataUrl;
+          photoCacheSet(team.id, dataUrl);
           try{ save(); }catch(err){ console.warn('Save error:', err); }
           renderAdmin();
         }, function(err){ console.warn('Avatar load error:', err); });
@@ -1482,10 +1489,11 @@ function renderResults(){
 // ── BOB SVG ──
 function bobSVG(t){
   const c=t.color,uid=t.id;
+  const photo = photoCacheGet(t.id) || t.photo || t.photoThumb;
   let embl;
-  if(t.photo){
+  if(photo){
     embl=`<rect x="27" y="4" width="32" height="24" rx="2" fill="rgba(255,255,255,0.15)"/>
-    <image href="${t.photo}" x="27" y="4" width="32" height="24" clip-path="url(#cp${uid})" preserveAspectRatio="xMidYMid meet"/>`;
+    <image href="${photo}" x="27" y="4" width="32" height="24" clip-path="url(#cp${uid})" preserveAspectRatio="xMidYMid meet"/>`;
   } else {
     embl=`<rect x="27" y="4" width="32" height="24" rx="2" fill="rgba(255,255,255,0.22)"/>
     <text x="43" y="17" font-size="20" text-anchor="middle" dominant-baseline="central">${t.emoji}</text>`;
