@@ -264,11 +264,11 @@ body.results-mode .sync-status.status-off {
 /* Modern finish gate */
 .finish-gate {
   position: absolute; right: 40px; top: 0; bottom: 0;
-  width: 52px; z-index: 1; pointer-events: none;
+  width: 52px; z-index: 10; pointer-events: none;
 }
-/* Wide checkered column */
+/* Wide checkered column — starts below flag/label */
 .finish-gate-checks {
-  position: absolute; top: 0; bottom: 0; left: 50%;
+  position: absolute; top: 64px; bottom: 0; left: 50%;
   transform: translateX(-50%);
   width: 18px;
   background: repeating-conic-gradient(#fff 0% 25%, #111 0% 50%) 0 0 / 9px 9px;
@@ -277,7 +277,7 @@ body.results-mode .sync-status.status-off {
 }
 /* Subtle glow layer on top */
 .finish-gate-bar {
-  position: absolute; top: 0; bottom: 0; left: 50%;
+  position: absolute; top: 64px; bottom: 0; left: 50%;
   width: 18px; transform: translateX(-50%);
   background: linear-gradient(180deg,
     transparent 0%, rgba(255,255,255,0.08) 40%,
@@ -286,28 +286,30 @@ body.results-mode .sync-status.status-off {
 }
 /* Animated glow pulse */
 .finish-glow-line {
-  position: absolute; top: 0; bottom: 0; left: 50%;
+  position: absolute; top: 64px; bottom: 0; left: 50%;
   transform: translateX(-50%);
   width: 2px;
   background: linear-gradient(180deg, transparent, var(--accent) 25%, var(--accent) 75%, transparent);
   opacity: 0; animation: finishPulse 2.5s ease-in-out infinite;
 }
 @keyframes finishPulse { 0%,100%{opacity:0} 50%{opacity:0.55} }
-/* Checkered flag on top */
+/* Checkered flag above line */
 .finish-flag-top {
-  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
   font-size: 2rem; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  z-index: 11;
 }
-/* ZIEL label below flag */
+/* ZIEL label below flag, above first bob */
 .finish-label {
-  position: absolute; top: 36px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: 38px; left: 50%; transform: translateX(-50%);
   font-family: 'Poppins', sans-serif; font-weight: 800;
   font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
   color: #F7A81B; white-space: nowrap;
   text-shadow: 0 0 8px rgba(0,58,112,0.9);
+  z-index: 11;
 }
 
-.track-lanes-wrap { position: relative; padding: 12px 90px 12px 20px; display: flex; flex-direction: column; gap: 0; overflow: visible; }
+.track-lanes-wrap { position: relative; padding: 12px 90px 12px 20px; margin-top: 64px; display: flex; flex-direction: column; gap: 0; overflow: visible; }
 
 .lane { position: relative; height: 56px; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; align-items: center; overflow: visible; }
 .lane.lane-first { height: 72px; }
@@ -320,7 +322,7 @@ body.results-mode .sync-status.status-off {
   display: flex; flex-direction: row; align-items: center; gap: 6px;
   overflow: visible;
 }
-.bob-wrap.bob-first { z-index: 6; transform-origin: left center; }
+.bob-wrap.bob-first { z-index: 12; transform-origin: left center; }
 .bob-svg-outer { position: relative; width: 90px; height: 40px; flex-shrink: 0; overflow: visible; }
 
 /* rank on the LEFT */
@@ -368,7 +370,7 @@ body.results-mode .sync-status.status-off {
 .panel-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.78rem;
   color: #0f172a; letter-spacing: 2px; text-transform: uppercase;
   margin-bottom: 8px; }
-#rankList { display: flex; flex-direction: row; gap: 8px; min-width: max-content; }
+#rankList { display: flex; flex-direction: column; gap: 8px; min-width: unset; width: 100%; }
 .panel-row {
   display: flex; align-items: center; gap: 7px;
   background: #f8fafc; border: 1px solid #e2e8f0;
@@ -379,9 +381,10 @@ body.results-mode .sync-status.status-off {
 .panel-rank { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.85rem; width: 18px; text-align: center; flex-shrink: 0; }
 .panel-av { width: 24px; height: 24px; border-radius: 5px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; background: #e2e8f0; }
 .panel-av img { width: 100%; height: 100%; object-fit: cover; }
-.panel-info { min-width: 0; }
+.panel-info { min-width: 0; flex: 1; }
 .panel-name { font-size: 0.75rem; font-weight: 600; color: #0f172a; }
-.panel-t { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: #475569; margin-top: 1px; }
+.panel-times { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #64748b; margin-top: 2px; display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; }
+.panel-total { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: #0f172a; background: #f1f5f9; border-radius: 4px; padding: 1px 6px; margin-left: 4px; }
 .urkunde-btn { background: none; border: none; cursor: pointer; font-size: 0.85rem; padding: 2px 5px; border-radius: 5px; opacity: 0.55; transition: opacity 0.15s, background 0.15s; flex-shrink: 0; }
 .urkunde-btn:hover { opacity: 1; background: rgba(255,255,255,0.12); }
 
@@ -507,10 +510,12 @@ body.results-mode .sync-status.status-off {
 
   /* Finish gate smaller */
   .finish-gate { right: 20px; width: 36px; }
-  .finish-gate-checks { width: 14px; }
-  .finish-gate-bar { width: 14px; }
-  .finish-flag-top { font-size: 1.3rem; }
+  .finish-gate-checks { top: 56px; width: 14px; }
+  .finish-gate-bar { top: 56px; width: 14px; }
+  .finish-glow-line { top: 56px; }
+  .finish-flag-top { font-size: 1.4rem; top: 2px; }
   .finish-label { font-size: 0.85rem; top: 32px; }
+  .track-lanes-wrap { margin-top: 56px; padding: 8px 58px 8px 10px; }
 
   /* Rank panel: single column on mobile, no horizontal scroll */
   .rank-panel { overflow-x: hidden; }
@@ -1475,15 +1480,22 @@ function renderResults(){
     </div>`;
   }).join('');
   rl.innerHTML=r.map((t,i)=>{
-    const a=avg(t);const rank=i+1;
     const r1=pt(t.run1),r2=pt(t.run2);
-    const bestTime=a!==null?ft(a):(r1!==null?ft(r1):(r2!==null?ft(r2):null));
-    const timeLabel=a!==null?'Ø '+ft(a):(r1!==null?'L1 '+ft(r1):(r2!==null?'L2 '+ft(r2):'—'));
+    const a=avg(t);
     const m=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+    const timeParts = [];
+    if(r1!==null) timeParts.push(`Lauf 1: ${ft(r1)}`);
+    if(r2!==null) timeParts.push(`Lauf 2: ${ft(r2)}`);
+    const totalHtml = a!==null
+      ? `<span class="panel-total">Ø ${ft(a)}</span>`
+      : (r1!==null||r2!==null ? `<span class="panel-total">${ft(r1!==null?r1:r2)}</span>` : '—');
     return`<div class="panel-row">
       <div class="panel-rank" style="color:${rank===1?'#f59e0b':rank===2?'#94a3b8':rank===3?'#b45309':'#6b7280'}">${m||rank}</div>
       <div class="panel-av">${emblInner(t,44,5)}</div>
-      <div class="panel-info"><div class="panel-name">${t.name}</div><div class="panel-t">${timeLabel}</div></div>
+      <div class="panel-info">
+        <div class="panel-name">${t.name}</div>
+        <div class="panel-times">${timeParts.join(' / ')}${timeParts.length?' ':''}&nbsp;${totalHtml}</div>
+      </div>
     </div>`;
   }).join('');
   requestAnimationFrame(()=>{
