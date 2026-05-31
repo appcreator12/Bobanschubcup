@@ -1076,11 +1076,6 @@ async function repushAllThumbs(){
   });
 }
 
-  // clearSetup deaktiviert — verhindert versehentliches Trennen der Firebase-Verbindung
-  closeSetup();
-  renderQR();
-}
-
 async function downloadConfigured(){
   const cfg = syncConfig()||{};
   const dbUrl = cfg.dbUrl||'';
