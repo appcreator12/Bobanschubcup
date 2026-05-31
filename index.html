@@ -713,7 +713,7 @@ body.results-mode .sync-status.status-off {
     <!-- Disconnect -->
     <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:0.75rem;color:var(--muted)">Verbindung trennen:</span>
-      <button class="mbtn mbtn-s" onclick="clearSetup()" style="flex:0 0 auto;padding:5px 14px;font-size:0.78rem;color:var(--danger);border-color:rgba(239,68,68,0.3)">Trennen</button>
+      
     </div>
     <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:0.75rem;color:var(--muted)">Fotos fehlen in Firebase:</span>
@@ -1077,12 +1077,7 @@ async function repushAllThumbs(){
   });
 }
 
-function clearSetup(){
-  if(!confirm('Sync-Konfiguration löschen und nur lokal arbeiten?')) return;
-  localStorage.removeItem(SYNC_KEY);
-  SYNC_CONFIG.dbUrl='';
-  if(fbEventSource){ fbEventSource.close(); fbEventSource=null; }
-  setStatus('offline');
+  // clearSetup deaktiviert — verhindert versehentliches Trennen der Firebase-Verbindung
   closeSetup();
   renderQR();
 }
