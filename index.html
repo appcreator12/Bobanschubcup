@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bobanschubcup 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,600;1,700;1,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0c10;
@@ -1470,7 +1471,6 @@ function renderResults(){
     </div>`;
   }).join('');
   rl.innerHTML=r.map((t,i)=>{
-    const rank=i+1;
     const r1=pt(t.run1),r2=pt(t.run2);
     const a=avg(t);
     const m=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
@@ -1620,8 +1620,8 @@ function renderQR(){
 }
 </script>
 <!-- jsPDF + AutoTable for browser-side PDF generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
 <script>
 // ══════════════════════════════════════════════════════
 //  PDF EXPORT — Endergebnisse & Urkunden
