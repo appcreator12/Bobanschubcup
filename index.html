@@ -364,30 +364,29 @@ body.results-mode .sync-status.status-off {
 /* Ranking panel */
 .rank-panel {
   background: rgba(255,255,255,0.97); border-top: 3px solid #2563eb;
-  padding: 10px 16px 14px; z-index: 50; overflow-x: auto;
+  padding: 10px 16px 14px; z-index: 50; overflow-x: hidden;
   scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;
   box-shadow: 0 -4px 20px rgba(0,0,0,0.10);
 }
 .panel-title { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.78rem;
   color: #0f172a; letter-spacing: 2px; text-transform: uppercase;
   margin-bottom: 8px; }
-#rankList { display: flex; flex-direction: column; gap: 8px; min-width: unset; width: 100%; }
+#rankList { display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .panel-row {
   display: flex; align-items: center; gap: 7px;
   background: #f8fafc; border: 1px solid #e2e8f0;
-  border-radius: 10px; padding: 6px 10px; white-space: nowrap; flex-shrink: 0;
+  border-radius: 10px; padding: 6px 10px;
+  white-space: normal; flex-shrink: 1; min-width: 0;
   transition: background 0.15s, border-color 0.15s;
 }
 .panel-row:hover { background: #eff6ff; border-color: #93c5fd; }
-.panel-rank { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.85rem; width: 18px; text-align: center; flex-shrink: 0; }
-.panel-av { width: 24px; height: 24px; border-radius: 5px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; background: #e2e8f0; }
-.panel-av img { width: 100%; height: 100%; object-fit: cover; }
-.panel-info { min-width: 0; flex: 1; }
-.panel-name { font-size: 0.75rem; font-weight: 600; color: #0f172a; }
+.panel-rank { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.85rem; width: 22px; text-align: center; flex-shrink: 0; }
+.panel-av { width: 44px; height: 44px; border-radius: 5px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: #e2e8f0; }
+.panel-av img { width: 100%; height: 100%; object-fit: contain; }
+.panel-info { min-width: 0; flex: 1; overflow: hidden; }
+.panel-name { font-size: 0.75rem; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .panel-times { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #64748b; margin-top: 2px; display: flex; flex-wrap: wrap; gap: 0 12px; align-items: baseline; }
-.panel-total { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: #0f172a; background: #f1f5f9; border-radius: 4px; padding: 1px 6px; margin-left: 4px; }
-.urkunde-btn { background: none; border: none; cursor: pointer; font-size: 0.85rem; padding: 2px 5px; border-radius: 5px; opacity: 0.55; transition: opacity 0.15s, background 0.15s; flex-shrink: 0; }
-.urkunde-btn:hover { opacity: 1; background: rgba(255,255,255,0.12); }
+.panel-total { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: #0f172a; background: #f1f5f9; border-radius: 4px; padding: 1px 6px; margin-left: 4px; flex-shrink: 0; }
 
 /* ══ MODAL ══ */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; }
