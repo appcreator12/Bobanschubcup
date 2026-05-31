@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bobanschubcup 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,600;1,700;1,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0c10;
@@ -877,13 +876,7 @@ function applyRemoteData(data){
   try{ localStorage.setItem('bpch26_photos', JSON.stringify(pm)); }catch(e){}
   loadPhotosFromLocal();
   setStatus('connected');
-  if(!isResultsView){
-    // Kein Re-render wenn der Nutzer gerade eine Zeit eingibt – würde Fokus zerstören
-    const focused = document.activeElement;
-    if(!focused || !focused.classList.contains('time-inp')){
-      renderAdmin();
-    }
-  }
+  if(!isResultsView) renderAdmin();
   if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
   // Wenn Fotos lokal vorhanden aber Thumbnails in Firebase fehlen → neu generieren & pushen
   const missingThumbs = teams.filter(t => t.photo && !t.photoThumb);
@@ -1626,8 +1619,8 @@ function renderQR(){
 }
 </script>
 <!-- jsPDF + AutoTable for browser-side PDF generation -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script>
 // ══════════════════════════════════════════════════════
 //  PDF EXPORT — Endergebnisse & Urkunden
