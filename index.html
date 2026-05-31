@@ -877,7 +877,13 @@ function applyRemoteData(data){
   try{ localStorage.setItem('bpch26_photos', JSON.stringify(pm)); }catch(e){}
   loadPhotosFromLocal();
   setStatus('connected');
-  if(!isResultsView) renderAdmin();
+  if(!isResultsView){
+    // Kein Re-render wenn der Nutzer gerade eine Zeit eingibt – würde Fokus zerstören
+    const focused = document.activeElement;
+    if(!focused || !focused.classList.contains('time-inp')){
+      renderAdmin();
+    }
+  }
   if(document.getElementById('resultsPage').classList.contains('active')) renderResults();
   // Wenn Fotos lokal vorhanden aber Thumbnails in Firebase fehlen → neu generieren & pushen
   const missingThumbs = teams.filter(t => t.photo && !t.photoThumb);
